@@ -1529,3 +1529,23 @@ body.dark-mode .error-bg {
     box-shadow: var(--shadow);
     border-radius: 12px;
 }
+
+/* --- WARNA WARNING (KUNING) --- */
+.warning-bg {
+    background-color: #FEF3C7; /* Kuning Pucat */
+    color: #D97706; /* Kuning Tua / Oranye */
+}
+
+/* Tombol Secondary (Putih/Abu) untuk cancel */
+.btn-secondary {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-secondary:hover {
+    background-color: var(--hover-bg);
+}

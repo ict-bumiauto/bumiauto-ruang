@@ -7,379 +7,352 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1. AUTH & INITIALIZATION
     // ============================================================
     const savedName = localStorage.getItem('currentUser');
-    if (!savedName) {
-        window.location.href = 'login.html';
-        return;
-    }
+    if (!savedName) { window.location.href = 'login.html'; return; }
 
-    const headerNameElement = document.getElementById('headerUserName');
-    if (headerNameElement) headerNameElement.innerText = savedName;
+    document.getElementById('headerUserName').innerText = savedName;
+    const formNameEl = document.getElementById('formBorrowerName');
+    if (formNameEl) formNameEl.value = savedName;
 
-    const formNameElement = document.getElementById('formBorrowerName');
-    if (formNameElement) formNameElement.value = savedName;
+    document.querySelector('.sign-out-btn')?.addEventListener('click', (e) => {
+        e.preventDefault(); localStorage.clear(); window.location.href = 'login.html';
+    });
 
-    // Logout
-    const signOutBtn = document.querySelector('.sign-out-btn');
-    if (signOutBtn) {
-        signOutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('currentUser'); 
-            localStorage.removeItem('userRole'); 
-            window.location.href = 'login.html'; 
-        });
-    }
-
-    // Admin Mode Check
     const userRole = localStorage.getItem('userRole');
     if (userRole === 'admin') {
-        const pageTitle = document.querySelector('.page-title h1');
-        if (pageTitle) {
-            pageTitle.innerText = "Admin Booking Mode";
-            pageTitle.style.color = "#Eab308";
-        }
-        const backArrow = document.querySelector('.back-arrow');
-        if (backArrow) {
-            backArrow.onclick = function() { window.location.href = 'admin.html'; };
-        }
+        document.querySelector('.page-title h1').innerText = "Admin Booking Mode";
+        document.querySelector('.page-title h1').style.color = "#Eab308";
+        document.querySelector('.back-arrow').onclick = () => window.location.href = 'admin.html';
     }
 
     // ============================================================
-    // 2. AUTO-FILL DATE & TIME PICKER
+    // 2. FORM HELPERS (Date, Time, Addons)
     // ============================================================
+    // Auto-fill Date
     const urlParams = new URLSearchParams(window.location.search);
     const dateParam = urlParams.get('date');
     if (dateParam) {
         const dateInput = document.querySelector('input[name="date"]');
-        if (dateInput) {
-            dateInput.value = dateParam;
-            dateInput.classList.add('input-highlight'); 
-        }
+        if(dateInput) { dateInput.value = dateParam; dateInput.classList.add('input-highlight'); }
     }
 
+    // Time Picker
     const startSelect = document.getElementById('startTime');
     const endSelect = document.getElementById('endTime');
     const startHour = 8; const endHour = 18;
 
-    function populateTimeSelect(selectElement) {
-        selectElement.innerHTML = '<option value="">Select time</option>';
-        for (let hour = startHour; hour <= endHour; hour++) {
-            for (let min = 0; min < 60; min += 30) {
-                if (hour === endHour && min > 0) break;
-                const val = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-                const option = document.createElement('option');
-                option.value = val; option.text = val;
-                selectElement.appendChild(option);
+    function populateTimeSelect(el) {
+        el.innerHTML = '<option value="">Select time</option>';
+        for (let h = startHour; h <= endHour; h++) {
+            for (let m = 0; m < 60; m += 30) {
+                if (h === endHour && m > 0) break;
+                const val = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                const opt = document.createElement('option');
+                opt.value = val; opt.text = val;
+                el.appendChild(opt);
             }
         }
     }
-
     if (startSelect && endSelect) {
-        populateTimeSelect(startSelect);
-        populateTimeSelect(endSelect);
+        populateTimeSelect(startSelect); populateTimeSelect(endSelect);
         startSelect.addEventListener('change', function() {
-            if (!this.value) return;
+            if(!this.value) return;
             let [h, m] = this.value.split(':').map(Number);
-            h += 1; 
-            const nextTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-            const exists = [...endSelect.options].some(o => o.value === nextTime);
-            if (exists) endSelect.value = nextTime;
+            h += 1;
+            const next = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+            const exist = [...endSelect.options].some(o => o.value === next);
+            if(exist) endSelect.value = next;
         });
     }
 
-    // ============================================================
-    // 3. DYNAMIC ADD-ONS
-    // ============================================================
+    // Dynamic Addons
     const addonsToggle = document.getElementById('addonsToggle');
     const addonsContainer = document.getElementById('addonsContainer');
     const addonsList = document.getElementById('addonsList');
     const btnAddRow = document.getElementById('btnAddRow');
-    const MAX_ITEMS = 2;
 
     function createAddonRow() {
         const row = document.createElement('div');
         row.className = 'addon-row';
         row.innerHTML = `
-            <select name="addonType[]" class="input-field addon-select">
-                <option value="Snack">Snack</option>
-                <option value="Fasilitas">Fasilitas</option>
-            </select>
+            <select name="addonType[]" class="input-field addon-select"><option value="Snack">Snack</option><option value="Fasilitas">Fasilitas</option></select>
             <input type="text" name="addonDetail[]" class="input-field addon-input" placeholder="Detail...">
-            <button type="button" class="btn-remove-row">✕</button>
-        `;
+            <button type="button" class="btn-remove-row">✕</button>`;
         return row;
     }
-
-    function checkAddonLimit() {
-        if (!addonsList || !btnAddRow) return;
-        if (addonsList.children.length >= MAX_ITEMS) btnAddRow.style.display = 'none';
-        else btnAddRow.style.display = 'block';
-    }
-
+    
     if (addonsToggle) {
         addonsToggle.addEventListener('change', function() {
-            if (this.checked) {
-                addonsContainer.style.display = 'block';
-                if (addonsList.children.length === 0) addonsList.appendChild(createAddonRow());
-            } else {
-                addonsContainer.style.display = 'none';
-                addonsList.innerHTML = '';
-            }
-            checkAddonLimit();
+            addonsContainer.style.display = this.checked ? 'block' : 'none';
+            if(this.checked && addonsList.children.length === 0) addonsList.appendChild(createAddonRow());
+            if(!this.checked) addonsList.innerHTML = '';
         });
     }
+    if (btnAddRow) btnAddRow.addEventListener('click', () => { if(addonsList.children.length < 2) addonsList.appendChild(createAddonRow()); });
+    if (addonsList) addonsList.addEventListener('click', (e) => { if(e.target.classList.contains('btn-remove-row')) e.target.closest('.addon-row').remove(); });
 
-    if (btnAddRow) {
-        btnAddRow.addEventListener('click', () => {
-            if (addonsList.children.length < MAX_ITEMS) {
-                addonsList.appendChild(createAddonRow());
-                checkAddonLimit();
-            }
-        });
-    }
-
-    if (addonsList) {
-        addonsList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('btn-remove-row')) {
-                e.target.closest('.addon-row').remove();
-                checkAddonLimit();
-                if (addonsList.children.length === 0) {
-                    addonsToggle.checked = false;
-                    addonsContainer.style.display = 'none';
-                }
-            }
-        });
-    }
 
     // ============================================================
-    // 4. VALIDASI KAPASITAS RUANGAN
+    // 3. VALIDASI KAPASITAS (VISUAL ONLY)
     // ============================================================
     const roomSelectEl = document.getElementById('roomSelect');
-    const participantsInput = document.getElementById('numParticipants'); 
+    const participantsInput = document.getElementById('numParticipants');
     const capacityMsg = document.getElementById('capacityMsg');
 
-    function checkCapacity() {
-        const selectedOption = roomSelectEl.options[roomSelectEl.selectedIndex];
-        const maxCapacity = parseInt(selectedOption.getAttribute('data-capacity')) || 0;
-        const currentVal = parseInt(participantsInput.value) || 0;
+    function checkCapacityVisual() {
+        const sel = roomSelectEl.options[roomSelectEl.selectedIndex];
+        const max = parseInt(sel.getAttribute('data-capacity')) || 0;
+        const current = parseInt(participantsInput.value) || 0;
 
-        if (maxCapacity > 0 && currentVal > 0) {
-            if (currentVal > maxCapacity) {
-                participantsInput.classList.add('input-error');
-                if(capacityMsg) {
-                    capacityMsg.style.display = 'block';
-                    capacityMsg.innerText = `⚠️ Maksimal ${maxCapacity} orang untuk ruangan ini.`;
-                }
-            } else {
-                participantsInput.classList.remove('input-error');
-                if(capacityMsg) capacityMsg.style.display = 'none';
+        if (max > 0 && current > 0 && current > max) {
+            participantsInput.classList.add('input-error');
+            if(capacityMsg) {
+                capacityMsg.style.display = 'block';
+                capacityMsg.innerText = `⚠️ Melebihi standar (${max} orang), namun tetap bisa diajukan.`;
             }
+            return true; // Return true jika over capacity
         } else {
             participantsInput.classList.remove('input-error');
             if(capacityMsg) capacityMsg.style.display = 'none';
+            return false;
         }
     }
 
     if (roomSelectEl && participantsInput) {
-        roomSelectEl.addEventListener('change', checkCapacity);
-        participantsInput.addEventListener('input', checkCapacity);
+        roomSelectEl.addEventListener('change', checkCapacityVisual);
+        participantsInput.addEventListener('input', checkCapacityVisual);
     }
 
     // ============================================================
-    // 5. ROOM AVAILABILITY (FETCH FROM SERVER - DENGAN PENGAMAN)
+    // 4. MODAL HELPERS
     // ============================================================
-    async function updateRoomStatus() {
-        const now = new Date();
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        
-        try {
-            const response = await fetch(API_URL);
-            
-            // CEK 1: Apakah Server Error?
-            if (!response.ok) {
-                console.error("Server Error:", response.statusText);
-                return;
-            }
-
-            const allBookings = await response.json();
-
-            // CEK 2: Apakah Datanya Array?
-            if (!Array.isArray(allBookings)) {
-                console.error("Data dari server BUKAN array (Kemungkinan Error Object):", allBookings);
-                return; // Stop disini biar gak error 'filter is not a function'
-            }
-
-            const bookedRooms = allBookings
-                .filter(b => b.bookingDate === todayStr && b.status === 'Approved')
-                .map(b => b.roomName.trim());
-
-            const roomCards = document.querySelectorAll('.room-card-item');
-            roomCards.forEach(card => {
-                const titleEl = card.querySelector('h4');
-                const badgeEl = card.querySelector('span.badge');
-                const descEl = card.querySelector('p');
-
-                if (titleEl && badgeEl) {
-                    const roomName = titleEl.innerText.trim();
-                    if (bookedRooms.includes(roomName)) {
-                        badgeEl.innerText = 'Booked';
-                        badgeEl.className = 'badge badge-red';
-                        if (descEl) { descEl.innerText = 'Not Available Today'; descEl.style.color = '#EF4444'; }
-                    } else {
-                        badgeEl.innerText = 'Available';
-                        badgeEl.className = 'badge badge-black';
-                        if (descEl) { descEl.innerText = 'Ready to use'; descEl.style.color = ''; }
-                    }
-                }
-            });
-        } catch (error) {
-            console.error("Gagal koneksi ke API:", error);
-        }
-    }
-    updateRoomStatus(); 
-
-    // ============================================================
-    // 6. FORM SUBMIT & CONFLICT CHECK (DENGAN PENGAMAN)
-    // ============================================================
-    const form = document.getElementById('bookingForm');
-    const toMinutes = (str) => { const [h, m] = str.split(':').map(Number); return h * 60 + m; };
-
-    // Modal Helper
     window.showErrorModal = (title, message) => {
-        const modal = document.getElementById('statusModal');
-        if (modal) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalMessage').innerHTML = message;
-            modal.style.display = 'flex';
-        } else alert(title + "\n" + message);
+        const m = document.getElementById('statusModal');
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalMessage').innerHTML = message;
+        m.style.display = 'flex';
     };
     window.closeStatusModal = () => document.getElementById('statusModal').style.display = 'none';
-    window.onclick = (event) => { if (event.target == document.getElementById('statusModal')) closeStatusModal(); };
+    
+    // Modal Kapasitas
+    const capModal = document.getElementById('capacityModal');
+    window.closeCapacityModal = () => capModal.style.display = 'none';
+    
+    // Tombol "Tetap Lanjut" di dalam Modal
+    document.getElementById('btnProceedCapacity').onclick = () => {
+        closeCapacityModal();
+        processBooking(true); // Panggil fungsi inti dengan flag 'force' (opsional)
+    };
+
+    // ============================================================
+    // 5. LOGIKA SUBMIT UTAMA
+    // ============================================================
+    const form = document.getElementById('bookingForm');
 
     if (form) {
-        form.addEventListener('submit', async function(event) {
+        form.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-
+            // 1. Cek Integrity
             const integrity = form.querySelector('input[name="integrity"]');
             if (!integrity || !integrity.checked) {
                 alert('Please agree to the Integrity Pact Agreement.');
                 return;
             }
 
-            const roomSelect = document.getElementById('roomSelect');
-            const selectedRoomText = roomSelect.options[roomSelect.selectedIndex].text;
-
-            // --- CEK BENTROK VIA FETCH ---
-            try {
-                const response = await fetch(API_URL); 
+            // 2. Cek Kapasitas (Soft Block)
+            const isOverCapacity = checkCapacityVisual(); // Fungsi ini me-return true jika merah
+            
+            if (isOverCapacity) {
+                // TAMPILKAN MODAL WARNING
+                const sel = roomSelectEl.options[roomSelectEl.selectedIndex];
+                const max = parseInt(sel.getAttribute('data-capacity'));
+                const cur = parseInt(participantsInput.value);
                 
-                if (!response.ok) {
-                    alert("Gagal terhubung ke server (Cek Console).");
-                    return;
-                }
-
-                const allBookings = await response.json();
-
-                // PENGAMAN: Cek Array
-                if (!Array.isArray(allBookings)) {
-                    console.error("Respon Server bukan Array:", allBookings);
-                    alert("Terjadi kesalahan data dari server. Cek Console.");
-                    return;
-                }
-
-                const newStart = toMinutes(data.startTime);
-                const newEnd = toMinutes(data.endTime);
-
-                // Cari yang bentrok
-                const conflictingBooking = allBookings.find(booking => {
-                    if (booking.status === 'Rejected' || booking.status === 'Cancelled') return false;
-                    if (booking.roomName === selectedRoomText && booking.bookingDate === data.date) {
-                        const exStart = toMinutes(booking.startTime);
-                        const exEnd = toMinutes(booking.endTime);
-                        return (newStart < exEnd && newEnd > exStart);
-                    }
-                    return false;
-                });
-
-                // --- LOGIKA OVERRIDE ---
-                if (conflictingBooking) {
-                    const userRole = localStorage.getItem('userRole');
-                    const isPriorityDept = ['TOP MANAGEMENT', 'C-Level', 'General Manager'].includes(data.sbu);
-
-                    if (userRole === 'admin' && isPriorityDept) {
-                        const confirmMsg = `⚠️ PRIORITY OVERRIDE!\n\nRuangan dipakai: ${conflictingBooking.borrowerName}\nTimpa jadwal mereka?`;
-                        
-                        if (confirm(confirmMsg)) {
-                            // UPDATE STATUS BOOKING LAMA -> CANCELLED
-                            await fetch(`${API_URL}/${encodeURIComponent(conflictingBooking.ticketNumber)}`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
-                                    status: 'Cancelled',
-                                    notes: (conflictingBooking.notes || '') + " [Override by Admin]"
-                                })
-                            });
-                        } else {
-                            return; // Batal
-                        }
-                    } else {
-                        showErrorModal("Jadwal Bentrok!", `Ruangan <b>${selectedRoomText}</b> sudah terisi.`);
-                        return;
-                    }
-                }
-
-                // --- PROSES SIMPAN DATA BARU ---
-                const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, "");
-                const rand = Math.floor(1000 + Math.random() * 9000);
-                const ticketID = `#BA-${dateStr}-${rand}`;
-
-                let addonsData = [];
-                const addonTypes = document.querySelectorAll('select[name="addonType[]"]');
-                const addonDetails = document.querySelectorAll('input[name="addonDetail[]"]');
-                if (addonTypes) {
-                    addonTypes.forEach((sel, i) => {
-                        const det = addonDetails[i].value;
-                        if (det.trim() !== "") addonsData.push({ type: sel.value, detail: det });
-                    });
-                }
-
-                const initialStatus = (localStorage.getItem('userRole') === 'admin') ? 'Approved' : 'Pending';
-
-                const newBooking = {
-                    ticketNumber: ticketID,
-                    borrowerName: data.borrowerName,
-                    department: data.sbu,
-                    purpose: data.purpose,
-                    roomName: selectedRoomText,
-                    bookingDate: data.date,
-                    startTime: data.startTime,
-                    endTime: data.endTime,
-                    addOns: addonsData,
-                    notes: data.notes || '',
-                    status: initialStatus
-                };
-
-                // POST KE DATABASE
-                const saveResponse = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newBooking)
-                });
-
-                if (saveResponse.ok) {
-                    localStorage.setItem('lastBookingData', JSON.stringify(newBooking));
-                    window.location.href = 'submit.html';
-                } else {
-                    const errData = await saveResponse.json();
-                    alert(`Gagal menyimpan: ${errData.message || 'Server Error'}`);
-                }
-
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Terjadi kesalahan koneksi ke server.");
+                document.getElementById('capModalMessage').innerHTML = 
+                    `Ruangan ini maksimal <b>${max} orang</b>, tapi Anda memasukkan <b>${cur} orang</b>.<br><br>Apakah Anda yakin ingin tetap melanjutkan?`;
+                
+                capModal.style.display = 'flex';
+                return; // Stop di sini, tunggu user klik tombol di modal
             }
+
+            // Jika aman, langsung proses
+            processBooking();
         });
     }
+
+    // ============================================================
+    // 7. DASHBOARD STATS & RECENT BOOKINGS (REAL-TIME)
+    // ============================================================
+    async function updateDashboardStats() {
+        // Indikator Loading (Opsional biar user tau lagi proses)
+        const recentContainer = document.querySelector('.recent-bookings');
+        if(recentContainer) recentContainer.innerHTML = '<p style="padding:20px; text-align:center;">Loading data...</p>';
+
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) return; // Silent fail biar gak ganggu user
+            
+            const allBookings = await response.json();
+            if (!Array.isArray(allBookings)) return;
+
+            // --- A. UPDATE QUICK STATS ---
+            // Hitung jumlah berdasarkan status
+            const total = allBookings.length;
+            const approved = allBookings.filter(b => b.status === 'Approved').length;
+            const pending = allBookings.filter(b => b.status === 'Pending').length;
+
+            // Update Angka di HTML (Pastikan class selector-nya benar)
+            // Kita cari elemen berdasarkan struktur HTML sidebar
+            const statsList = document.querySelector('.quick-stats .stats-list');
+            if (statsList) {
+                // Total
+                statsList.children[0].querySelector('.stat-value').innerText = total;
+                // Approved
+                statsList.children[1].querySelector('.stat-value').innerText = approved;
+                // Pending
+                statsList.children[2].querySelector('.stat-value').innerText = pending;
+            }
+
+            // --- B. UPDATE RECENT BOOKINGS (GLOBAL LIST) ---
+            const recentContainer = document.querySelector('.recent-bookings');
+            if (recentContainer) {
+                // Ambil 5 data terbaru (karena dari server sudah urut created_at desc, tinggal slice)
+                const recentData = allBookings.slice(0, 5);
+
+                let htmlContent = '<h3>Recent Bookings</h3>';
+                
+                if (recentData.length === 0) {
+                    htmlContent += '<p class="empty-state" style="color:#999; font-size:13px;">No bookings yet.</p>';
+                } else {
+                    htmlContent += '<ul style="list-style:none; padding:0; margin-top:10px;">';
+                    
+                    recentData.forEach(booking => {
+                        // Tentukan warna status
+                        let statusColor = '#64748B'; // Default gray
+                        if(booking.status === 'Approved') statusColor = '#10B981'; // Green
+                        if(booking.status === 'Pending') statusColor = '#F59E0B';  // Orange
+                        if(booking.status === 'Rejected' || booking.status === 'Cancelled') statusColor = '#EF4444'; // Red
+
+                        // Format tampilan: Nama - Ruang (Jam)
+                        htmlContent += `
+                            <li style="margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-weight:bold; font-size:13px; color:var(--text-main);">${booking.borrowerName}</span>
+                                    <span style="font-size:10px; font-weight:bold; color:${statusColor}; border:1px solid ${statusColor}; padding:1px 4px; border-radius:4px;">${booking.status}</span>
+                                </div>
+                                <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                                    ${booking.department} • ${booking.roomName}
+                                </div>
+                                <div style="font-size:11px; color:var(--text-muted);">
+                                    📅 ${booking.bookingDate} (${booking.startTime}-${booking.endTime})
+                                </div>
+                            </li>
+                        `;
+                    });
+                    htmlContent += '</ul>';
+                }
+
+                // Masukkan ke dalam container (Timpa isinya)
+                recentContainer.innerHTML = htmlContent;
+            }
+
+        } catch (error) {
+            console.error("Gagal update dashboard:", error);
+        }
+    }
+
+    // Jalankan fungsi ini saat load
+    updateDashboardStats();
+
+    // ============================================================
+    // 6. FUNGSI INTI PROSES BOOKING (KE SERVER)
+    // ============================================================
+    async function processBooking() {
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        const roomSelect = document.getElementById('roomSelect');
+        const selectedRoomText = roomSelect.options[roomSelect.selectedIndex].text;
+        const toMinutes = (s) => { const [h,m]=s.split(':').map(Number); return h*60+m; };
+
+        try {
+            // A. Cek Bentrok
+            const response = await fetch(API_URL);
+            const allBookings = await response.json();
+            if (!Array.isArray(allBookings)) throw new Error("Data error");
+
+            const newStart = toMinutes(data.startTime);
+            const newEnd = toMinutes(data.endTime);
+
+            const conflictingBooking = allBookings.find(b => {
+                if (b.status === 'Rejected' || b.status === 'Cancelled') return false;
+                if (b.roomName === selectedRoomText && b.bookingDate === data.date) {
+                    const exStart = toMinutes(b.startTime); const exEnd = toMinutes(b.endTime);
+                    return (newStart < exEnd && newEnd > exStart);
+                }
+                return false;
+            });
+
+            // B. Logic Override
+            if (conflictingBooking) {
+                const userRole = localStorage.getItem('userRole');
+                const isPriorityDept = ['TOP MANAGEMENT', 'C-Level', 'General Manager'].includes(data.sbu);
+
+                if (userRole === 'admin' && isPriorityDept) {
+                    if (confirm(`⚠️ OVERRIDE?\nRuangan dipakai: ${conflictingBooking.borrowerName}\nTimpa?`)) {
+                        await fetch(`${API_URL}/${encodeURIComponent(conflictingBooking.ticketNumber)}`, {
+                            method: 'PUT',
+                            headers: {'Content-Type':'application/json'},
+                            body: JSON.stringify({ status: 'Cancelled', notes: 'Override by Admin' })
+                        });
+                    } else return;
+                } else {
+                    showErrorModal("Jadwal Bentrok!", `Ruangan <b>${selectedRoomText}</b> sudah terisi.`);
+                    return;
+                }
+            }
+
+            // C. Simpan Data
+            const ticketID = `#BA-${new Date().toISOString().slice(0,10).replace(/-/g,"")}-${Math.floor(1000+Math.random()*9000)}`;
+            
+            let addonsData = [];
+            document.querySelectorAll('select[name="addonType[]"]').forEach((sel, i) => {
+                const det = document.querySelectorAll('input[name="addonDetail[]"]')[i].value;
+                if(det.trim()) addonsData.push({ type: sel.value, detail: det });
+            });
+
+            const initialStatus = (localStorage.getItem('userRole') === 'admin') ? 'Approved' : 'Pending';
+
+            const newBooking = {
+                ticketNumber: ticketID,
+                borrowerName: data.borrowerName,
+                department: data.sbu,
+                purpose: data.purpose,
+                roomName: selectedRoomText,
+                bookingDate: data.date,
+                startTime: data.startTime,
+                endTime: data.endTime,
+                addOns: addonsData,
+                notes: data.notes || '',
+                status: initialStatus
+            };
+
+            const saveRes = await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(newBooking)
+            });
+
+            if (saveRes.ok) {
+                localStorage.setItem('lastBookingData', JSON.stringify(newBooking));
+                window.location.href = 'submit.html';
+            } else {
+                alert("Gagal menyimpan data.");
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Terjadi kesalahan koneksi.");
+        }
+    }
+
 });

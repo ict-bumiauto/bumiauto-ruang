@@ -205,6 +205,25 @@
         </div>
     </div>
 
+    <div id="capacityModal" class="modal-overlay">
+        <div class="modal-box center-modal">
+            
+            <div class="modal-icon-wrapper warning-bg">
+                <span class="modal-icon">⚠️</span>
+            </div>
+
+            <h3 id="capModalTitle">Over Capacity Warning!</h3>
+            <p id="capModalMessage" style="margin-bottom: 20px;">
+                Jumlah peserta melebihi kapasitas ruangan. Apakah Anda yakin ingin tetap melanjutkan?
+            </p>
+
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button class="btn-secondary" onclick="closeCapacityModal()" style="flex:1;">Batal</button>
+                <button class="btn-primary-full" id="btnProceedCapacity" style="flex:1; margin-top:0; background-color:#F59E0B;">Tetap Lanjut</button>
+            </div>
+        </div>
+    </div>
+
     <script src="theme.js"></script>
     <script src="app.js"></script>
 </body>
