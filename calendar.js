@@ -1,43 +1,69 @@
-// calendar.js
-const API_URL = '/api/bookings';
+// GANTI DENGAN LINK API VERCEL ANDA (Sama seperti di app.js)
+const API_URL = '/api/bookings'; 
+
 document.addEventListener('DOMContentLoaded', function() {
     
-    // --- 1. USER AUTH ---
+    // ============================================================
+    // 1. USER AUTH
+    // ============================================================
     const savedName = localStorage.getItem('currentUser');
-    if (!savedName) { window.location.href = '/login'; return; }
-    document.getElementById('headerUserName').innerText = savedName;
+    if (!savedName) { window.location.href = '/'; return; } // Balik ke Login
+    
+    const headerName = document.getElementById('headerUserName');
+    if(headerName) headerName.innerText = savedName;
 
-    // --- 2. UPDATE ROOM STATUS (MERAH/HITAM) ---
-    async function updateRoomStatus() {
-        const now = new Date();
-        const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    // Logout
+    document.querySelector('.sign-out-btn')?.addEventListener('click', (e) => {
+        e.preventDefault(); localStorage.clear(); window.location.href = '/';
+    });
 
-        try {
-            const res = await fetch(API_URL);
-            const allBookings = await res.json();
+    // ============================================================
+    // 2. DASHBOARD STATS & RECENT BOOKINGS (DITAMBAHKAN)
+    // ============================================================
+    async function updateDashboardStats(allBookings) {
+        // --- A. UPDATE QUICK STATS ---
+        const statsList = document.querySelector('.quick-stats .stats-list');
+        if (statsList) {
+            const total = allBookings.length;
+            const approved = allBookings.filter(b => b.status === 'Approved').length;
+            const pending = allBookings.filter(b => b.status === 'Pending').length;
+            
+            statsList.children[0].querySelector('.stat-value').innerText = total;
+            statsList.children[1].querySelector('.stat-value').innerText = approved;
+            statsList.children[2].querySelector('.stat-value').innerText = pending;
+        }
 
-            const bookedRooms = allBookings
-                .filter(b => b.bookingDate === todayStr && b.status === 'Approved')
-                .map(b => b.roomName.trim());
-
-            document.querySelectorAll('.room-card-item').forEach(card => {
-                const title = card.querySelector('h4').innerText.trim();
-                const badge = card.querySelector('span.badge');
-                const desc = card.querySelector('p');
-
-                if (bookedRooms.includes(title)) {
-                    badge.innerText = 'Not Available'; badge.className = 'badge badge-red';
-                    desc.innerText = 'Booked'; desc.style.color = '#EF4444';
-                } else {
-                    badge.innerText = 'Available'; badge.className = 'badge badge-black';
-                    desc.innerText = 'Ready'; desc.style.color = '';
-                }
-            });
-        } catch(e) { console.error(e); }
+        // --- B. UPDATE RECENT BOOKINGS ---
+        const recentContainer = document.querySelector('.recent-bookings');
+        if (recentContainer) {
+            const recentData = allBookings.slice(0, 5); // Ambil 5 terbaru
+            let htmlContent = '<h3>Recent Bookings</h3>';
+            
+            if (recentData.length === 0) {
+                htmlContent += '<p style="color:#999; font-size:13px;">No bookings yet.</p>';
+            } else {
+                htmlContent += '<ul style="list-style:none; padding:0; margin-top:10px;">';
+                recentData.forEach(b => {
+                    let color = b.status === 'Approved' ? '#10B981' : (b.status === 'Pending' ? '#F59E0B' : '#EF4444');
+                    htmlContent += `
+                        <li style="margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="font-weight:bold; font-size:13px;">${b.borrowerName}</span>
+                                <span style="font-size:10px; font-weight:bold; color:${color}; border:1px solid ${color}; padding:1px 4px; border-radius:4px;">${b.status}</span>
+                            </div>
+                            <div style="font-size:11px; color:#64748B;">${b.roomName}</div>
+                            <div style="font-size:11px; color:#64748B;">📅 ${b.bookingDate} (${b.startTime}-${b.endTime})</div>
+                        </li>`;
+                });
+                htmlContent += '</ul>';
+            }
+            recentContainer.innerHTML = htmlContent;
+        }
     }
-    updateRoomStatus();
 
-    // --- 3. RENDER KALENDER ---
+    // ============================================================
+    // 3. FETCH DATA & RENDER (GABUNGAN)
+    // ============================================================
     const daysTag = document.querySelector(".calendar-days");
     const currentDateDisplay = document.querySelector("#currentMonthYear");
     let date = new Date();
@@ -45,36 +71,31 @@ document.addEventListener('DOMContentLoaded', function() {
     let currMonth = date.getMonth();
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    // Fungsi Render Async
-    const renderCalendar = async () => {
+    const renderPage = async () => {
+        let allBookings = [];
+        try {
+            const res = await fetch(API_URL);
+            if(res.ok) allBookings = await res.json();
+        } catch(e) { console.error("Gagal load data"); }
+
+        // PANGGIL UPDATE STATS & ROOM STATUS
+        updateDashboardStats(allBookings);
+        updateRoomStatus(allBookings);
+
+        // --- RENDER KALENDER ---
         let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(); 
         let lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(); 
         let lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); 
         let lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay();
-
         let liTag = "";
 
-        // FETCH DATA DULU
-        let allBookings = [];
-        try {
-            const res = await fetch(API_URL);
-            allBookings = await res.json();
-        } catch(e) { console.error("Gagal load kalender"); }
-
-        for (let i = firstDayofMonth; i > 0; i--) { 
-            liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
-        }
+        for (let i = firstDayofMonth; i > 0; i--) liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
 
         for (let i = 1; i <= lastDateofMonth; i++) { 
             let isToday = i === new Date().getDate() && currMonth === new Date().getMonth() && currYear === new Date().getFullYear();
             let activeClass = isToday ? "active" : ""; 
             
-            // Format YYYY-MM-DD (Manual string manipulation biar aman timezone)
-            let currentMonthStr = String(currMonth + 1).padStart(2, '0');
-            let currentDayStr = String(i).padStart(2, '0');
-            let currentFullDate = `${currYear}-${currentMonthStr}-${currentDayStr}`;
-
-            // Cek Event Approved
+            let currentFullDate = `${currYear}-${String(currMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
             let events = allBookings.filter(b => b.bookingDate === currentFullDate && b.status === 'Approved');
             
             let eventHTML = '';
@@ -84,20 +105,46 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             liTag += `<li class="${activeClass}" onclick="selectDate(${currYear}, ${currMonth}, ${i})" style="cursor: pointer;">
-                        <span class="date-num">${i}</span>
-                        ${eventHTML}
-                      </li>`;
+                        <span class="date-num">${i}</span>${eventHTML}</li>`;
         }
 
-        for (let i = lastDayofMonth; i < 6; i++) { 
-            liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
-        }
+        for (let i = lastDayofMonth; i < 6; i++) liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
 
         currentDateDisplay.innerText = `${months[currMonth]} ${currYear}`;
         daysTag.innerHTML = liTag;
     };
 
-    renderCalendar();
+    // Jalankan Render
+    renderPage();
+
+    // ============================================================
+    // 4. UPDATE ROOM STATUS (WIDGET BAWAH)
+    // ============================================================
+    function updateRoomStatus(allBookings) {
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        
+        const bookedRooms = allBookings
+            .filter(b => b.bookingDate === todayStr && b.status === 'Approved')
+            .map(b => b.roomName.trim());
+
+        document.querySelectorAll('.room-card-item').forEach(card => {
+            const titleEl = card.querySelector('h4');
+            const badgeEl = card.querySelector('span.badge');
+            const descEl = card.querySelector('p');
+
+            if (titleEl && badgeEl) {
+                const name = titleEl.innerText.trim();
+                if (bookedRooms.includes(name)) {
+                    badgeEl.innerText = 'Booked'; badge.className = 'badge badge-red';
+                    if(descEl) { descEl.innerText = 'Not Available'; descEl.style.color = '#EF4444'; }
+                } else {
+                    badgeEl.innerText = 'Available'; badge.className = 'badge badge-black';
+                    if(descEl) { descEl.innerText = 'Ready'; descEl.style.color = ''; }
+                }
+            }
+        });
+    }
 
     // Navigasi Bulan
     document.querySelectorAll(".nav-btn").forEach(icon => {
@@ -107,20 +154,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 date = new Date(currYear, currMonth, new Date().getDate());
                 currYear = date.getFullYear(); currMonth = date.getMonth();
             } else { date = new Date(); }
-            renderCalendar();
+            renderPage(); // Panggil ulang render
         });
     });
 
-    // Pindah ke Form Booking
+    // Pindah ke Form
     window.selectDate = (y, m, d) => {
         const fullDate = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        window.location.href = `/?date=${fullDate}`;
+        window.location.href = `/dashboard?date=${fullDate}`; // Pastikan ke dashboard
     };
-    
-    // Logout
-    document.querySelector('.sign-out-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        localStorage.clear();
-        window.location.href = '/login';
-    });
 });
