@@ -1549,3 +1549,41 @@ body.dark-mode .error-bg {
 .btn-secondary:hover {
     background-color: var(--hover-bg);
 }
+
+/* --- FIX CAROUSEL & SCROLL --- */
+.room-list-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.room-list {
+    display: flex !important;
+    gap: 15px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 5px;
+    /* Sembunyikan Scrollbar tapi tetap bisa scroll */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.room-list::-webkit-scrollbar {
+    display: none;
+}
+
+.room-card-item {
+    /* Paksa lebar agar minimal 3 kartu, sisanya harus scroll */
+    flex: 0 0 300px; /* Lebar fix 300px per kartu */
+    min-width: 300px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 15px;
+    transition: transform 0.2s;
+}
+
+.room-card-item:hover {
+    transform: translateY(-2px); /* Efek naik dikit pas dihover */
+}
