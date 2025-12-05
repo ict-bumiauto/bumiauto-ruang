@@ -1551,78 +1551,85 @@ body.dark-mode .error-bg {
 }
 
 /* =========================================
-   FIX CAROUSEL MACET & MELEBAR (FINAL)
+   FIX CAROUSEL: RAPI & TIDAK MELEBAR
 ========================================= */
 
-/* 1. KUNCI WADAH PEMBUNGKUS (PENTING!) */
-/* Ini agar carousel tidak menjebol lebar halaman */
-.room-list-wrapper {
-    width: 100%;           /* Lebar mengikuti induknya */
-    max-width: 100vw;      /* Jangan pernah melebihi lebar layar */
-    overflow: hidden;      /* Sembunyikan apapun yang keluar dari kotak ini */
-    position: relative;    /* Agar tombol panah bisa diposisikan */
-    padding: 0 5px;        /* Sedikit padding agar bayangan kartu tidak kepotong */
+/* 1. Container Utama (Wajib 100% dari induknya, jangan 100vw) */
+.availability-section {
+    width: 100%; 
+    overflow: hidden; /* Mencegah scrollbar ganda di halaman */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-top: 20px;
 }
 
-/* 2. ATUR WADAH SCROLLING (.room-list) */
-.room-list {
-    display: flex;         /* Jejerkan ke samping */
-    flex-wrap: nowrap;     /* JANGAN pernah turun ke baris baru (PENTING) */
-    overflow-x: auto;      /* Izinkan scroll horizontal di sini */
-    gap: 15px;             /* Jarak antar kartu */
-    width: 100%;           /* Penuhi wadah pembungkus */
-    padding-bottom: 15px;  /* Ruang untuk bayangan bawah */
-    
-    /* Sembunyikan Scrollbar Jelek (Opsional) */
-    scroll-behavior: smooth;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+/* 2. Wrapper Carousel */
+.room-list-wrapper {
+    width: 100%;
+    position: relative;
+    /* Hapus padding aneh-aneh */
+    padding: 5px 0; 
 }
-/* Sembunyikan scrollbar di Chrome/Safari */
+
+/* 3. Area Scroll (.room-list) */
+.room-list {
+    display: flex;
+    gap: 15px;             /* Jarak antar kartu yang pas */
+    overflow-x: auto;      /* Scroll menyamping */
+    scroll-behavior: smooth;
+    padding-bottom: 10px;  /* Ruang untuk bayangan bawah */
+    
+    /* Sembunyikan Scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
 .room-list::-webkit-scrollbar {
     display: none;
 }
 
-/* 3. ATUR KARTU ITEM (.room-card-item) */
+/* 4. Kartu (.room-card-item) - UKURAN FIX & CANTIK */
 .room-card-item {
-    /* MATIKAN kemampuan kartu untuk mengecil (shrink) */
-    /* flex: grow shrink basis */
-    flex: 0 0 auto;        
+    /* Flex: Tidak boleh mengecil (shrink), tidak boleh membesar (grow) */
+    flex: 0 0 auto; 
     
-    /* Set lebar FIX agar konsisten */
-    width: 280px;          
+    width: 260px; /* Ukuran standar kartu yang enak dilihat */
     
-    /* Style standar kartu */
-    background-color: var(--bg-card);
+    background-color: var(--bg-card) !important;
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Bayangan halus */
     padding: 15px;
-    transition: transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Bayangan halus */
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* Efek hover */
 .room-card-item:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
 }
 
-/* Pastikan konten di dalam kartu rapi */
+/* Konten dalam kartu */
 .room-info {
     display: flex;
-    align-items: flex-start;
+    align-items: center; /* Rata tengah vertikal */
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .room-info h4 {
     margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-    /* Agar judul panjang tidak merusak layout */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px; 
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.room-info p {
+    margin: 2px 0 0 0;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.pin-icon {
+    font-size: 18px;
 }
