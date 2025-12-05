@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading('Verifying User...');
 
             setTimeout(() => {
-                window.location.href = '/'; // Pindah ke User Dashboard
+                window.location.href = '/dashboard'; // Pindah ke User Dashboard
             }, 1000);
         }
     });

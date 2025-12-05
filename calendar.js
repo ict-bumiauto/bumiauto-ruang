@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // --- 1. USER AUTH ---
     const savedName = localStorage.getItem('currentUser');
-    if (!savedName) { window.location.href = '/login'; return; }
+    if (!savedName) { window.location.href = '/'; return; }
     document.getElementById('headerUserName').innerText = savedName;
 
     // --- 2. UPDATE ROOM STATUS (MERAH/HITAM) ---
@@ -121,6 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.sign-out-btn').addEventListener('click', (e) => {
         e.preventDefault();
         localStorage.clear();
-        window.location.href = '/login';
+        window.location.href = '/';
     });
 });
