@@ -7,6 +7,10 @@
     { "source": "/login", "destination": "/login.html" },
     
     { "source": "/dashboard", "destination": "/index.html" },
-    { "source": "/index", "destination": "/index.html" }
+    
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/calendar", "destination": "/calendar.html" },
+    { "source": "/admin_calendar", "destination": "/admin_calendar.html" },
+    { "source": "/submit", "destination": "/submit.html" }
   ]
 }
