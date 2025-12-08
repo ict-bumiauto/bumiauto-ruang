@@ -615,14 +615,23 @@ body {
 }
 
 /* =========================================
-   FIX CAROUSEL: 3 KARTU RAPI + BADGE MUNCUL
+   FIX CAROUSEL: 3 KARTU PRESISI (ANTI MELAR)
 ========================================= */
+
+/* 0. RESET PENTING (Agar padding tidak merusak ukuran) */
+.availability-section, 
+.room-list-wrapper, 
+.room-list, 
+.room-card-item {
+    box-sizing: border-box !important;
+}
 
 /* 1. Container Utama */
 .availability-section {
     width: 100%;
-    overflow: hidden; /* Kunci agar tidak melebar ke body */
-    padding: 10px 5px;
+    max-width: 100%; /* Kunci agar tidak lewat layar */
+    overflow: hidden;
+    padding: 10px 0;
 }
 
 /* 2. Wrapper Carousel */
@@ -631,97 +640,112 @@ body {
     position: relative;
 }
 
-/* 3. Area Scroll (.room-list) */
+/* 3. Area Scroll */
 .room-list {
     display: flex;
-    gap: 15px;             /* Jarak antar kartu */
+    flex-wrap: nowrap;     /* Baris tunggal */
     overflow-x: auto;      /* Scroll horizontal */
-    padding-bottom: 10px;  
+    width: 100%;
+    
+    /* PENGATURAN JARAK */
+    gap: 20px;             /* Jarak antar kartu */
+    padding: 5px 2px 15px 2px; /* Padding dikit biar bayangan ga kepotong */
     
     /* Sembunyikan Scrollbar */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
-.room-list::-webkit-scrollbar {
-    display: none;
-}
+.room-list::-webkit-scrollbar { display: none; }
 
-/* 4. Kartu (.room-card-item) - SETTINGAN KUNCI */
+/* 4. KARTU ITEM (3 KARTU / LAYAR) */
 .room-card-item {
-    /* -- Rumus 3 Kartu -- */
-    /* (100% layar - total jarak gap) dibagi 3 */
-    width: calc((100% - 30px) / 3); 
+    /* RUMUS MATEMATIKA: 
+       (100% Lebar Layar - Total Gap) / 3 Kartu 
+       Total Gap = 20px * 2 celah = 40px */
     
-    /* Jangan menyusut (shrink) atau membesar (grow) */
-    flex: 0 0 auto; 
+    flex: 0 0 calc((100% - 40px) / 3);
+    width: calc((100% - 40px) / 3);
+    max-width: calc((100% - 40px) / 3); /* Paksa jangan lebih */
     
-    /* -- INTERIOR KARTU (PENTING!) -- */
-    display: flex !important;           
-    flex-direction: row !important;     /* Baris: Info Kiri, Badge Kanan */
-    align-items: center !important;     /* Rata tengah vertikal */
-    justify-content: space-between !important; /* Dorong ke ujung kiri & kanan */
+    /* LAYOUT DALAM KARTU (Kiri-Kanan) */
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     
     background-color: var(--bg-card) !important;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    min-height: 80px; /* Pastikan tinggi kartu konsisten */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    min-height: 80px;
 }
 
-/* Responif: HP (1 Kartu), Tablet (2 Kartu) */
-@media (max-width: 768px) {
-    .room-card-item { width: calc((100% - 15px) / 2); }
-}
-@media (max-width: 480px) {
-    .room-card-item { width: 95%; }
+/* RESPONSIF (Wajib agar tidak hancur di HP) */
+@media (max-width: 1024px) {
+    /* Tablet: 2 Kartu */
+    .room-card-item {
+        flex: 0 0 calc((100% - 20px) / 2);
+        width: calc((100% - 20px) / 2);
+        max-width: calc((100% - 20px) / 2);
+    }
 }
 
-/* 5. Konten Info Ruangan (Kiri) */
+@media (max-width: 600px) {
+    /* HP: 1 Kartu */
+    .room-card-item {
+        flex: 0 0 95%;
+        width: 95%;
+        max-width: 95%;
+    }
+}
+
+/* 5. TEXT INFO (Kiri) */
 .room-info {
     display: flex;
     align-items: center;
     gap: 10px;
-    max-width: 70%; /* Batasi lebar teks agar tidak nabrak badge */
-}
-
-.room-info div {
-    display: flex;
-    flex-direction: column; /* Judul di atas, status kecil di bawah */
+    /* Batasi lebar teks agar tidak menabrak badge */
+    max-width: 65%; 
+    overflow: hidden;
 }
 
 .room-info h4 {
     margin: 0;
     font-size: 13px;
     font-weight: 700;
-    line-height: 1.2;
+    white-space: nowrap;      /* Jangan turun baris */
+    overflow: hidden;         /* Potong kalau kepanjangan */
+    text-overflow: ellipsis;  /* Kasih titik-titik (...) */
     color: var(--text-main);
 }
 
 .room-info p {
-    margin: 2px 0 0 0;
+    margin: 0;
     font-size: 10px;
     color: var(--text-muted);
 }
 
-/* 6. Badge Status (Kanan) - AGAR TIDAK HILANG */
+/* 6. BADGE (Kanan) - PASTIKAN MUNCUL */
 .badge {
-    flex-shrink: 0; /* JANGAN PERNAH MENGECIL biarpun teks panjang */
-    padding: 4px 10px;
-    border-radius: 20px;
+    flex-shrink: 0; /* JANGAN MENGECIL */
+    padding: 5px 12px;
+    border-radius: 50px;
     font-size: 10px;
-    font-weight: bold;
+    font-weight: 800;
     text-transform: uppercase;
-    white-space: nowrap; /* Teks jangan turun baris */
+    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
-/* Pastikan warna badge keluar */
+/* WARNA BADGE (Pakai !important biar ga ketimpa) */
 .badge-black {
-    background-color: #000000 !important;
+    background-color: #1e293b !important; /* Hitam/Abu Tua */
     color: #ffffff !important;
 }
+
 .badge-red {
-    background-color: #EF4444 !important;
+    background-color: #ef4444 !important; /* Merah */
     color: #ffffff !important;
 }
 
