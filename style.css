@@ -614,64 +614,86 @@ body {
     font-weight: 700;
 }
 
-/* -- ROOM AVAILABILITY SECTION -- */
-.availability-section h3 {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 15px;
+/* =========================================
+   FIX CAROUSEL: 3 KARTU / VIEW (FINAL FIX)
+========================================= */
+
+/* 1. Container Utama (Mengunci Lebar) */
+.availability-section {
+    width: 100%;
+    overflow: hidden; 
+    padding-top: 20px;
 }
 
+/* 2. Wrapper Carousel (Agar Tombol Panah Bekerja di Luar Scroll Area) */
+.room-list-wrapper {
+    position: relative;
+    /* Lebar dikunci agar sesuai dengan container induk */
+    width: 100%; 
+    padding: 10px 0;
+}
+
+/* 3. Area Scroll (.room-list) */
 .room-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 Kolom kartu */
-    gap: 15px;
+    display: flex;
+    /* Izinkan scroll horizontal */
+    overflow-x: auto; 
+    flex-wrap: nowrap; /* JANGAN PERNAH TURUN BARIS */
+    
+    gap: 15px; /* Jarak antar kartu */
+    scroll-behavior: smooth;
+    
+    /* PENTING: Padding agar kartu di ujung terlihat penuh */
+    padding-right: 15px; 
+
+    /* Sembunyikan Scrollbar */
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+}
+.room-list::-webkit-scrollbar {
+    display: none;
 }
 
+/* 4. Kartu (.room-card-item) - Hitungan 3 KARTU */
 .room-card-item {
-    background: var(--white);
+    /* Formula: Bagi 100% lebar container, kurangi total jarak (gap) */
+    /* 100% / 3 = 33.33%. Total gap = 15px * 2 = 30px */
+    /* calc((100% - 30px) / 3) memastikan 3 kartu pas dengan gap */
+    width: calc((100% - 30px) / 3); 
+    
+    /* Kartu tidak boleh membesar atau mengecil */
+    flex: 0 0 auto; 
+    
+    /* Styling Visual */
+    background-color: var(--bg-card) !important;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    
+    /* Pastikan tinggi kartu sama */
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: flex-start;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.room-info {
-    display: flex;
-    gap: 10px;
+.room-card-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
 }
 
-.pin-icon {
-    color: var(--text-muted);
-    font-size: 16px;
+/* Style untuk layar kecil/mobile (Opsional, tapi penting) */
+@media (max-width: 768px) {
+    .room-card-item {
+        /* Di mobile, tampilkan 2 kartu saja */
+        width: calc((100% - 15px) / 2); 
+    }
 }
-
-.room-info h4 {
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 3px;
-}
-
-.room-info p {
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.badge-black {
-    background-color: #0F172A;
-    color: white;
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-weight: 600;
-}
-
-/* Responsive agar kartu ruangan turun ke bawah di layar kecil */
-@media (max-width: 1000px) {
-    .room-list {
-        grid-template-columns: 1fr;
+@media (max-width: 500px) {
+    .room-card-item {
+        /* Di HP kecil, tampilkan 1 kartu saja */
+        width: 95%; 
     }
 }
 
@@ -825,41 +847,6 @@ body.dark-mode select option {
 body.dark-mode select {
     background-color: var(--bg-input);
     color: var(--text-main);
-}
-
-/* --- CAROUSEL ROOM STYLES (FIXED 3 ITEMS) --- */
-
-.room-list-wrapper {
-    overflow: hidden;
-    width: 100%;
-    position: relative;
-}
-
-.room-list {
-    display: flex !important;
-    gap: 15px; /* Jarak antar kartu */
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 5px;
-    
-    /* Sembunyikan Scrollbar */
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.room-list::-webkit-scrollbar {
-    display: none;
-}
-
-/* KUNCI: Paksa ukuran kartu agar muat pas 3 biji */
-.room-card-item {
-    /* Rumus: (100% dibagi 3) dikurangi sedikit gap-nya */
-    flex: 0 0 calc(33.333% - 10px); 
-    max-width: calc(33.333% - 10px);
-    
-    box-sizing: border-box;
-    /* Hapus min-width pixel agar tidak meledak di layar kecil */
-    min-width: 0; 
 }
 
 /* Navigasi */
@@ -1548,64 +1535,6 @@ body.dark-mode .error-bg {
 }
 .btn-secondary:hover {
     background-color: var(--hover-bg);
-}
-
-/* =========================================
-   FIX CAROUSEL: RAPI & TIDAK MELEBAR
-========================================= */
-
-/* 1. Container Utama (Wajib 100% dari induknya, jangan 100vw) */
-.availability-section {
-    width: 100%; 
-    overflow: hidden; /* Mencegah scrollbar ganda di halaman */
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    margin-top: 20px;
-}
-
-/* 2. Wrapper Carousel */
-.room-list-wrapper {
-    width: 100%;
-    position: relative;
-    /* Hapus padding aneh-aneh */
-    padding: 5px 0; 
-}
-
-/* 3. Area Scroll (.room-list) */
-.room-list {
-    display: flex;
-    gap: 15px;             /* Jarak antar kartu yang pas */
-    overflow-x: auto;      /* Scroll menyamping */
-    scroll-behavior: smooth;
-    padding-bottom: 10px;  /* Ruang untuk bayangan bawah */
-    
-    /* Sembunyikan Scrollbar */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-.room-list::-webkit-scrollbar {
-    display: none;
-}
-
-/* 4. Kartu (.room-card-item) - UKURAN FIX & CANTIK */
-.room-card-item {
-    /* Flex: Tidak boleh mengecil (shrink), tidak boleh membesar (grow) */
-    flex: 0 0 auto; 
-    
-    width: 260px; /* Ukuran standar kartu yang enak dilihat */
-    
-    background-color: var(--bg-card) !important;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Bayangan halus */
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.room-card-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
 }
 
 /* Konten dalam kartu */
