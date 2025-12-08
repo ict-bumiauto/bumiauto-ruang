@@ -615,86 +615,114 @@ body {
 }
 
 /* =========================================
-   FIX CAROUSEL: 3 KARTU / VIEW (FINAL FIX)
+   FIX CAROUSEL: 3 KARTU RAPI + BADGE MUNCUL
 ========================================= */
 
-/* 1. Container Utama (Mengunci Lebar) */
+/* 1. Container Utama */
 .availability-section {
     width: 100%;
-    overflow: hidden; 
-    padding-top: 20px;
+    overflow: hidden; /* Kunci agar tidak melebar ke body */
+    padding: 10px 5px;
 }
 
-/* 2. Wrapper Carousel (Agar Tombol Panah Bekerja di Luar Scroll Area) */
+/* 2. Wrapper Carousel */
 .room-list-wrapper {
+    width: 100%;
     position: relative;
-    /* Lebar dikunci agar sesuai dengan container induk */
-    width: 100%; 
-    padding: 10px 0;
 }
 
 /* 3. Area Scroll (.room-list) */
 .room-list {
     display: flex;
-    /* Izinkan scroll horizontal */
-    overflow-x: auto; 
-    flex-wrap: nowrap; /* JANGAN PERNAH TURUN BARIS */
+    gap: 15px;             /* Jarak antar kartu */
+    overflow-x: auto;      /* Scroll horizontal */
+    padding-bottom: 10px;  
     
-    gap: 15px; /* Jarak antar kartu */
-    scroll-behavior: smooth;
-    
-    /* PENTING: Padding agar kartu di ujung terlihat penuh */
-    padding-right: 15px; 
-
     /* Sembunyikan Scrollbar */
-    scrollbar-width: none; 
+    scrollbar-width: none;
     -ms-overflow-style: none;
 }
 .room-list::-webkit-scrollbar {
     display: none;
 }
 
-/* 4. Kartu (.room-card-item) - Hitungan 3 KARTU */
+/* 4. Kartu (.room-card-item) - SETTINGAN KUNCI */
 .room-card-item {
-    /* Formula: Bagi 100% lebar container, kurangi total jarak (gap) */
-    /* 100% / 3 = 33.33%. Total gap = 15px * 2 = 30px */
-    /* calc((100% - 30px) / 3) memastikan 3 kartu pas dengan gap */
+    /* -- Rumus 3 Kartu -- */
+    /* (100% layar - total jarak gap) dibagi 3 */
     width: calc((100% - 30px) / 3); 
     
-    /* Kartu tidak boleh membesar atau mengecil */
+    /* Jangan menyusut (shrink) atau membesar (grow) */
     flex: 0 0 auto; 
     
-    /* Styling Visual */
+    /* -- INTERIOR KARTU (PENTING!) -- */
+    display: flex !important;           
+    flex-direction: row !important;     /* Baris: Info Kiri, Badge Kanan */
+    align-items: center !important;     /* Rata tengah vertikal */
+    justify-content: space-between !important; /* Dorong ke ujung kiri & kanan */
+    
     background-color: var(--bg-card) !important;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 15px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: transform 0.2s, box-shadow 0.2s;
-    
-    /* Pastikan tinggi kartu sama */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    min-height: 80px; /* Pastikan tinggi kartu konsisten */
 }
 
-.room-card-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
-}
-
-/* Style untuk layar kecil/mobile (Opsional, tapi penting) */
+/* Responif: HP (1 Kartu), Tablet (2 Kartu) */
 @media (max-width: 768px) {
-    .room-card-item {
-        /* Di mobile, tampilkan 2 kartu saja */
-        width: calc((100% - 15px) / 2); 
-    }
+    .room-card-item { width: calc((100% - 15px) / 2); }
 }
-@media (max-width: 500px) {
-    .room-card-item {
-        /* Di HP kecil, tampilkan 1 kartu saja */
-        width: 95%; 
-    }
+@media (max-width: 480px) {
+    .room-card-item { width: 95%; }
+}
+
+/* 5. Konten Info Ruangan (Kiri) */
+.room-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 70%; /* Batasi lebar teks agar tidak nabrak badge */
+}
+
+.room-info div {
+    display: flex;
+    flex-direction: column; /* Judul di atas, status kecil di bawah */
+}
+
+.room-info h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-main);
+}
+
+.room-info p {
+    margin: 2px 0 0 0;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* 6. Badge Status (Kanan) - AGAR TIDAK HILANG */
+.badge {
+    flex-shrink: 0; /* JANGAN PERNAH MENGECIL biarpun teks panjang */
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap; /* Teks jangan turun baris */
+}
+
+/* Pastikan warna badge keluar */
+.badge-black {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+.badge-red {
+    background-color: #EF4444 !important;
+    color: #ffffff !important;
 }
 
 /* --- DYNAMIC ADD-ONS STYLES --- */
@@ -1360,35 +1388,6 @@ select.input-field:focus {
 /* Saat Dark Mode, ganti warna panah jadi PUTIH (#FFFFFF) agar terlihat */
 body.dark-mode .addon-select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-}
-
-/* --- FIX ROOM AVAILABILITY BACKGROUND --- */
-
-/* 1. Reset Container Utama agar Transparan (Menyatu dengan background abu) */
-.availability-section {
-    background-color: transparent !important; /* Hapus background putih */
-    border: none !important;                  /* Hapus border kotak besar */
-    box-shadow: none !important;              /* Hapus bayangan kotak besar */
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-/* 2. Pastikan KARTU RUANGAN (Anak) tetap Putih & Timbul */
-.room-card-item {
-    background-color: var(--bg-card) !important; /* Tetap Putih/Card Color */
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow); /* Tambahkan shadow di tiap kartu kecil */
-    border-radius: 12px;
-}
-
-/* --- BADGE STATUS WARNA --- */
-.badge-red {
-    background-color: #EF4444; /* Merah */
-    color: white;
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-weight: 600;
 }
 
 /* --- CUSTOM STATUS MODAL STYLES --- */
