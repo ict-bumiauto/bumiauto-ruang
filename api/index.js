@@ -143,5 +143,10 @@ app.put('/api/bookings/:ticketNumber', async (req, res) => {
     }
 });
 
+// TEST ROUTE: Untuk mengecek apakah backend hidup
+app.get('/api/test', (req, res) => {
+    res.json({ status: "Backend is Alive!", timestamp: new Date() });
+});
+
 // WAJIB: Export App untuk Vercel
 module.exports = app;
