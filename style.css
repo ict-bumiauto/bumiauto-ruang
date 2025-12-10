@@ -1545,3 +1545,63 @@ body.dark-mode .error-bg {
 .pin-icon {
     font-size: 18px;
 }
+
+/* =========================================
+   STYLING FORM LOGIN (MODERN LOOK)
+========================================= */
+
+/* 1. Wrapper untuk Input & Icon */
+.input-wrapper {
+    position: relative; /* Wajib: Agar icon bisa menumpang di atas input */
+    width: 100%;
+}
+
+/* 2. Styling Kotak Input (Email & Password) */
+.input-wrapper input, 
+.form-group input:not([type="checkbox"]) {
+    width: 100%;
+    /* Padding: Atas 12px, Kanan 15px, Bawah 12px, KIRI 45px (Biar gak nabrak icon) */
+    padding: 12px 15px 12px 45px; 
+    
+    background-color: #F8FAFC;    /* Abu sangat muda (Clean) */
+    border: 1px solid #E2E8F0;    /* Garis pinggir halus */
+    border-radius: 10px;          /* Sudut melengkung modern */
+    
+    font-size: 14px;
+    font-family: 'Inter', sans-serif; /* Pastikan font sesuai */
+    color: #1E293B;               /* Warna teks gelap */
+    
+    outline: none;                /* Hapus outline bawaan browser */
+    transition: all 0.3s ease;    /* Animasi halus saat diklik */
+}
+
+/* 3. Efek Saat Input Diklik (Focus State) */
+.input-wrapper input:focus,
+.form-group input:not([type="checkbox"]):focus {
+    background-color: #FFFFFF;    /* Jadi putih bersih */
+    border-color: #3B82F6;        /* Border jadi Biru */
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); /* Efek Glow/Cahaya Biru */
+}
+
+/* 4. Styling Icon (Gembok / Amplop) */
+.input-icon {
+    position: absolute;
+    left: 15px;       /* Jarak dari kiri */
+    top: 50%;         /* Posisi tengah vertikal */
+    transform: translateY(-50%); /* Koreksi agar benar-benar di tengah */
+    
+    color: #94A3B8;   /* Warna abu soft */
+    font-size: 16px;
+    pointer-events: none; /* Agar klik tembus ke input */
+    transition: color 0.3s ease;
+}
+
+/* 5. Icon Berubah Warna saat Input Aktif */
+.input-wrapper:focus-within .input-icon {
+    color: #3B82F6; /* Icon jadi biru juga */
+}
+
+/* 6. Pesan Error / Helper (Opsional) */
+input::placeholder {
+    color: #CBD5E1; /* Warna placeholder lebih pudar */
+}
