@@ -1,58 +1,120 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUMI AUTO - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Portal | Bumi Auto Booking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Styling Khusus Halaman Portal */
+        body {
+            background-color: #F8FAFC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .portal-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid #E2E8F0;
+        }
+        .logo-area {
+            margin-bottom: 30px;
+        }
+        .logo-area img {
+            height: 40px; /* Sesuaikan tinggi logo */
+            margin-bottom: 15px;
+        }
+        .portal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 10px;
+        }
+        .portal-desc {
+            color: #64748B;
+            font-size: 14px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        /* Tombol Login (Biru) */
+        .btn-login {
+            background-color: #2563EB;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+        .btn-login:hover {
+            background-color: #1D4ED8;
+            transform: translateY(-2px);
+        }
+        /* Tombol Guest (Putih/Outline) */
+        .btn-guest {
+            background-color: white;
+            color: #1E293B;
+            border: 1px solid #CBD5E1;
+        }
+        .btn-guest:hover {
+            background-color: #F1F5F9;
+            border-color: #94A3B8;
+        }
+        .copyright {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #94A3B8;
+        }
+    </style>
 </head>
-<body class="login-page">
+<body>
 
-    <button id="themeToggle" class="theme-btn-floating">🌙</button>
+    <div class="portal-card">
+        <div class="logo-area">
+            <h1 style="color:#2563EB; font-weight:800; letter-spacing:-1px; margin:0;">HAKA AUTO</h1>
+        </div>
 
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <img src="logo_haka.png" alt="BUMI AUTO Logo" class="login-logo">
-                <h2>Welcome Back!</h2>
-                <p>Please sign in to your account</p>
-            </div>
+        <h2 class="portal-title">Room Booking System</h2>
+        <p class="portal-desc">
+            Selamat datang di sistem peminjaman ruang meeting. Silakan pilih akses Anda di bawah ini.
+        </p>
 
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" class="input-field" placeholder="name@hakaauto.co.id" required>
-                </div>
+        <a href="/login" class="action-btn btn-login">
+            <i class="fas fa-sign-in-alt"></i> Sign In (Employee)
+        </a>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
-                        
-                        <input type="password" id="password" placeholder="Enter password" required>
-                        
-                    </div>
-                </div>
+        <a href="/calendar" class="action-btn btn-guest">
+            <i class="fas fa-calendar-alt"></i> View Calendar (Guest)
+        </a>
 
-                <div class="login-options">
-                    <label class="checkbox-container">
-                        <input type="checkbox"> 
-                        <span class="text-sm">Remember me</span>
-                    </label>
-                    <a href="forgot-password.html" class="forgot-password">Forgot Password?</a>
-                </div>
-
-                <button type="submit" class="submit-btn login-btn">Sign In</button>
-            </form>
-
-            <div class="login-footer">
-                <p>Don't have an account? <a href="mailto:info@hakaauto.com">Contact Admin</a></p>
-            </div>
+        <div class="copyright">
+            &copy; 2025 Haka Auto - ICT Division
         </div>
     </div>
 
-    <script src="login.js"></script>
-    <script src="theme.js"></script>
 </body>
 </html>

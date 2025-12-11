@@ -57,10 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Tombol Sign Out berubah jadi "Sign In"
         if (signOutBtn) {
             signOutBtn.innerText = "Sign In";
-            signOutBtn.style.backgroundColor = "#2563EB"; // Jadi biru
+            signOutBtn.style.backgroundColor = "#2563EB";
             signOutBtn.style.color = "white";
             signOutBtn.onclick = (e) => {
-                e.preventDefault(); window.location.href = '/'; // Ke Login
+                // UPDATE BARIS INI: Arahkan ke /login
+                e.preventDefault(); window.location.href = '/login'; 
             };
         }
 
