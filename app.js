@@ -8,6 +8,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1. AUTH & INITIALIZATION
     // ============================================================
     const savedName = localStorage.getItem('currentUser');
+
+    // --- PENJAGA PINTU UTAMA ---
+    if (!savedName) {
+        // Jika tidak ada nama (Guest), langsung tendang ke Login
+        // Jangan kasih ampun kalau masuk dashboard
+        window.location.href = '/'; 
+        // Stop script di sini agar form tidak sempat loading
+        return; 
+    }
+    
     if (!savedName) {
         if (!window.location.pathname.includes('calendar.html') && !window.location.pathname.endsWith('/calendar')) {
              // window.location.href = '/'; 
