@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedName = localStorage.getItem('currentUser');
     const bookingForm = document.getElementById('bookingForm');
 
-    // Jika ada form (berarti di Dashboard), tapi gak ada user login -> USIR!
+    // Cek: Jika ini halaman form, tapi user belum login -> USIR
     if (bookingForm && !savedName) {
         alert("Akses Ditolak: Anda harus login dulu!");
         window.location.href = '/login';
@@ -15,55 +15,87 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================================
-    // 2. AUTO-FILL FORM (Nama, Divisi, WA, Email)
+    // 2. GENERATE OPSI JAM (YANG HILANG TADI)
+    // ============================================================
+    function populateTimeSelects() {
+        const startSelect = document.querySelector('select[name="startTime"]');
+        const endSelect = document.querySelector('select[name="endTime"]');
+
+        if (!startSelect || !endSelect) return;
+
+        // Kosongkan dulu biar gak dobel
+        startSelect.innerHTML = '<option value="">Select time</option>';
+        endSelect.innerHTML = '<option value="">Select time</option>';
+
+        const startHour = 8; // Mulai jam 08:00
+        const endHour = 18;  // Sampai jam 18:00
+
+        for (let i = startHour; i <= endHour; i++) {
+            // Format jam (misal 8 jadi "08")
+            const hour = i.toString().padStart(2, '0');
+            
+            // Opsi :00
+            const time00 = `${hour}:00`;
+            startSelect.add(new Option(time00, time00));
+            endSelect.add(new Option(time00, time00));
+
+            // Opsi :30 (kecuali jam terakhir)
+            if (i < endHour) {
+                const time30 = `${hour}:30`;
+                startSelect.add(new Option(time30, time30));
+                endSelect.add(new Option(time30, time30));
+            }
+        }
+    }
+
+    // Panggil fungsi ini agar dropdown terisi!
+    populateTimeSelects();
+
+
+    // ============================================================
+    // 3. AUTO-FILL FORM
     // ============================================================
     if (savedName && bookingForm) {
-        // 1. Isi Nama
+        // Isi Nama
         const formName = document.getElementById('formBorrowerName');
         if (formName) formName.value = savedName;
 
-        // 2. Isi Divisi
+        // Isi Divisi
         const savedDivision = localStorage.getItem('userDivision');
         const sbuSelect = document.querySelector('select[name="sbu"]');
         if (sbuSelect && savedDivision) sbuSelect.value = savedDivision;
 
-        // 3. Isi WhatsApp
+        // Isi WhatsApp
         const savedPhone = localStorage.getItem('userPhone');
-        const waInput = document.querySelector('input[name="whatsappNumber"]') || document.getElementById('whatsapp');
+        // Cari input WA (bisa ID 'whatsapp' atau name 'whatsappNumber')
+        const waInput = document.getElementById('whatsapp') || document.querySelector('input[name="whatsappNumber"]');
         if (waInput && savedPhone) waInput.value = savedPhone;
-        
-        // (Email diambil diam-diam saat submit nanti)
     }
 
+
     // ============================================================
-    // 3. HANDLE SUBMIT FORM (INI BAGIAN PENTING!)
+    // 4. HANDLE SUBMIT FORM
     // ============================================================
     if (bookingForm) {
         bookingForm.addEventListener('submit', async function(event) {
-            // [WAJIB] Mencegah refresh halaman
-            event.preventDefault(); 
+            event.preventDefault(); // Tahan biar gak refresh
             
-            console.log("📨 Tombol Submit Ditekan...");
+            console.log("📨 Mengirim Booking...");
 
             const submitBtn = document.querySelector('.submit-btn');
             const originalText = submitBtn.innerText;
-            
-            // Ubah tombol jadi Loading
             submitBtn.innerText = "⏳ Sending...";
             submitBtn.disabled = true;
 
             try {
-                // Kumpulkan Data Form
+                // Siapkan Data
                 const bookingData = {
                     ticketNumber: 'T-' + Date.now(),
-                    
-                    // Data User
                     borrowerName: document.getElementById('formBorrowerName').value,
-                    borrowerEmail: localStorage.getItem('userEmail'), // <--- EMAIL STAFF (PENTING!)
+                    borrowerEmail: localStorage.getItem('userEmail'), // Email user login
                     department: document.querySelector('select[name="sbu"]').value,
                     whatsapp: document.querySelector('input[name="whatsappNumber"]').value,
                     
-                    // Data Booking
                     purpose: document.getElementById('purpose').value,
                     bookingDate: document.getElementById('bookingDate').value,
                     startTime: document.querySelector('select[name="startTime"]').value,
@@ -71,15 +103,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     roomName: document.querySelector('select[name="roomName"]').value,
                     participants: document.getElementById('participants').value,
                     
-                    // Tambahan
                     addOns: document.getElementById('addOnsCheck')?.checked ? "Yes" : "No",
                     notes: document.getElementById('notes')?.value || "",
-                    status: 'Pending' // Default status
+                    status: 'Pending'
                 };
 
-                console.log("📦 Data Siap Kirim:", bookingData);
-
-                // Kirim ke Backend
+                // Kirim
                 const response = await fetch('/api/bookings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -89,19 +118,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // SUKSES
-                    alert("✅ Booking Berhasil Terkirim!\nSilakan tunggu persetujuan Admin.");
-                    window.location.href = '/calendar'; // Pindah ke kalender
+                    alert("✅ Booking Berhasil! Menunggu persetujuan Admin.");
+                    window.location.href = '/calendar';
                 } else {
-                    // GAGAL (Misal bentrok)
                     alert("❌ Gagal: " + result.message);
                 }
 
             } catch (error) {
                 console.error("Error:", error);
-                alert("⚠️ Terjadi kesalahan sistem: " + error.message);
+                alert("⚠️ Error Sistem: " + error.message);
             } finally {
-                // Balikin tombol (jika gagal)
                 submitBtn.innerText = originalText;
                 submitBtn.disabled = false;
             }
