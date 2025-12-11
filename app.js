@@ -24,16 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedDivision = localStorage.getItem('userDivision');
     const sbuSelect = document.querySelector('select[name="sbu"]'); // Dropdown Divisi
 
-    // === KODE BARU: AUTO-FILL WHATSAPP ===
+    // === KODE BARU: AUTO-FILL WHATSAPP (FINAL FIX) ===
     const savedPhone = localStorage.getItem('userPhone');
-    // Cari input WA (Sesuaikan name="..." dengan di HTML kamu)
-    // Biasanya name="whatsappNumber" atau id="whatsapp"
-    const waInput = document.querySelector('input[name="whatsapp"]') || document.getElementById('whatsapp');
+    
+    // Cari input WA dengan berbagai kemungkinan ID atau NAME
+    // (Biar gak salah panggil, kita coba semua kemungkinan)
+    const waInput = document.getElementById('whatsapp') || 
+                    document.querySelector('input[name="whatsappNumber"]') || 
+                    document.querySelector('input[name="whatsapp"]');
 
     if (waInput && savedPhone) {
+        console.log("Auto-filling WhatsApp:", savedPhone); // Cek Console untuk debugging
         waInput.value = savedPhone;
-        // Opsional: Buat read-only biar gak bisa diubah sembarangan
-        // waInput.readOnly = true; 
+        // waInput.readOnly = true; // Opsional: Matikan jika ingin dikunci
+    } else {
+        console.log("Info: WhatsApp tidak terisi. Input tidak ketemu atau data kosong.");
     }
 
     if (sbuSelect && savedDivision) {

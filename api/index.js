@@ -79,7 +79,8 @@ app.post('/api/login', async (req, res) => {
                 name: data.name,
                 email: data.email,
                 role: data.role,
-                division: data.division 
+                division: data.division,
+                phone: data.phone 
             }
         });
 
