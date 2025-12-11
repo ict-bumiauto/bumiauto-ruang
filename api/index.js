@@ -18,7 +18,7 @@ const RESEND_API_KEY = 're_hSLnyXYk_3F79zUuofZkBTUsSsXQqv1fQ';
 
 // Pengaturan Email
 const ADMIN_EMAIL = 'ict@hakaauto.co.id'; 
-const FROM_EMAIL = 'Bumi Auto Booking <onboarding@resend.dev>'; // Pakai default resend dulu biar aman
+const FROM_EMAIL = 'ict@hakaauto.co.id'; // Pakai default resend dulu biar aman
 
 // Inisialisasi Library
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
