@@ -106,25 +106,96 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- FUNGSI HANDLE ACTION (Global) ---
     window.handleAction = async (ticketID, newStatus) => {
-        if (!confirm(`Are you sure you want to ${newStatus} this request?`)) return;
 
-        try {
-            // PERBAIKAN DISINI: Tambahkan encodeURIComponent(ticketID)
-            const response = await fetch(`${API_URL}/${encodeURIComponent(ticketID)}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-            });
+        // 1. Cek Conflict jika mau Approve
+        if (newStatus === 'Approved') {
+            const currentRequest = window.allBookings.find(b => b.ticketNumber === ticketID);
+            if (currentRequest) {
+                const conflict = window.allBookings.find(b =>
+                    b.ticketNumber !== ticketID && // Bukan diri sendiri
+                    b.status === 'Approved' && // Sudah diapprove
+                    b.roomName === currentRequest.roomName && // Ruangan sama
+                    b.bookingDate === currentRequest.bookingDate && // Tanggal sama
+                    isOverlap(currentRequest.startTime, currentRequest.endTime, b.startTime, b.endTime) // Jam bentrok
+                );
 
-            if (response.ok) {
-                alert(`Request ${newStatus}!`);
-                fetchAndRender(); // Refresh tampilan otomatis
-            } else {
-                alert("Gagal update status. (Server Error)");
+                if (conflict) {
+                    const modal = document.getElementById('conflictModal');
+                    const pText = modal.querySelector('p');
+                    if (pText) pText.innerHTML = `Ruangan ini sudah dibooking oleh <b>${conflict.borrowerName}</b><br>pada jam ${conflict.startTime} - ${conflict.endTime}.`;
+                    modal.style.display = 'flex';
+                    return; // Stop proses
+                }
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Terjadi kesalahan server.");
         }
+
+        // 2. Tampilkan Konfirmasi MODAL
+        showConfirmation(
+            newStatus === 'Approved' ? 'Setujui Request?' : 'Tolak Request?',
+            `Anda akan mengubah status tiket <b>${ticketID}</b> menjadi <b>${newStatus}</b>.`,
+            async () => {
+                // Callback jika user pilih "Ya"
+                try {
+                    const response = await fetch(`${API_URL}/${encodeURIComponent(ticketID)}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    if (response.ok) {
+                        showStatusModal(true, 'Berhasil!', `Status request berhasil diubah menjadi ${newStatus}.`);
+                        fetchAndRender(); // Refresh tampilan
+                    } else {
+                        showStatusModal(false, 'Gagal!', 'Terjadi kesalahan saat menghubungi server.');
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    showStatusModal(false, 'Error!', 'Terjadi kesalahan koneksi.');
+                }
+            }
+        );
     };
+
+    // Helper: Modal Logic
+    function showConfirmation(title, msg, onConfirm) {
+        const modal = document.getElementById('confirmationModal');
+        document.getElementById('confirmTitle').innerText = title;
+        document.getElementById('confirmMessage').innerHTML = msg;
+
+        const btn = document.getElementById('confirmBtn');
+        // Reset Event Listener biar gak numpuk (cloning node trik paling aman/cepat)
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.onclick = () => {
+            modal.style.display = 'none';
+            onConfirm();
+        };
+
+        modal.style.display = 'flex';
+    }
+
+    function showStatusModal(isSuccess, title, msg) {
+        const modal = document.getElementById('statusModal');
+        const iconWrapper = document.getElementById('statusIcon');
+        const iconSpan = iconWrapper.querySelector('.modal-icon');
+
+        document.getElementById('statusTitle').innerText = title;
+        document.getElementById('statusMessage').innerText = msg;
+
+        if (isSuccess) {
+            iconWrapper.className = 'modal-icon-wrapper success-bg';
+            iconSpan.innerText = '✅';
+        } else {
+            iconWrapper.className = 'modal-icon-wrapper error-bg';
+            iconSpan.innerText = '❌';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    // Helper: Cek Overlap Jam (Format HH:MM)
+    function isOverlap(start1, end1, start2, end2) {
+        return (start1 < end2 && start2 < end1);
+    }
 });

@@ -105,10 +105,38 @@
             </div>
         </div>
     </div>
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box center-modal">
+            <h3 id="confirmTitle">Konfirmasi</h3>
+            <p id="confirmMessage" style="text-align: center; color: var(--text-muted); margin-bottom: 20px;">
+                Are you sure?
+            </p>
+            <div class="modal-actions" style="display:flex; gap:10px; width:100%;">
+                <button class="btn-calendar outline-btn" onclick="closeConfirmModal()">Batal</button>
+                <button id="confirmBtn" class="btn-primary-full">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Modal -->
+    <div id="statusModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box center-modal">
+            <div id="statusIcon" class="modal-icon-wrapper success-bg">
+                <span class="modal-icon">✅</span>
+            </div>
+            <h3 id="statusTitle">Berhasil!</h3>
+            <p id="statusMessage" style="text-align: center; color: var(--text-muted); margin-bottom: 20px;">
+                Action successful.
+            </p>
+            <button class="btn-primary-full" onclick="closeStatusModal()">OK</button>
+        </div>
+    </div>
+
     <script>
-        function closeConflictModal() {
-            document.getElementById('conflictModal').style.display = 'none';
-        }
+        function closeConflictModal() { document.getElementById('conflictModal').style.display = 'none'; }
+        function closeConfirmModal() { document.getElementById('confirmationModal').style.display = 'none'; }
+        function closeStatusModal() { document.getElementById('statusModal').style.display = 'none'; }
     </script>
     <script src="theme.js"></script>
     <script src="admin.js"></script>
