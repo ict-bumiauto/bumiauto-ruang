@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let eventHTML = '';
             events.forEach(evt => {
-                let shortName = evt.borrowerName.split(' ')[0];
-                eventHTML += `<div class="calendar-event">• ${shortName} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
+                let shortPurpose = evt.purpose.split(' ').slice(0, 3).join(' '); // Ambil 3 kata pertama
+                eventHTML += `<div class="calendar-event">• ${shortPurpose} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
             });
 
             // Klik Tanggal: Jika User -> Dashboard, Jika Guest -> Login
