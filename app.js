@@ -415,6 +415,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (saveRes.ok) {
+                // Simpan data untuk halaman konfirmasi
+                localStorage.setItem('lastBookingData', JSON.stringify(newBooking));
                 window.location.href = '/submit'; // Redirect Sukses
             } else {
                 const errData = await saveRes.json();

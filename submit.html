@@ -186,21 +186,18 @@
             // 1. Ambil data dari LocalStorage
             const rawData = localStorage.getItem('lastBookingData');
 
-            // Jika data tidak ada (misal user langsung buka link submit.html tanpa isi form)
+            // Jika data tidak ada, mungkin coba ambil dari dummy atau biarkan kosong (User Request: Hapus Pop-up)
+            let data = {}; // Initialize data as an empty object
             if (!rawData) {
-                const modal = document.getElementById('missingDataModal');
-                if (modal) {
-                    modal.style.display = 'flex'; // Tampilkan Modal Modern
-                } else {
-                    window.location.href = '/dashboard';
-                }
-                return;
+                console.warn("Data booking tidak ditemukan di LocalStorage.");
+                // Tidak melakukan redirect/modal agar user tetap bisa melihat halaman (walaupun kosong)
+                // The page will display "undefined" or "Loading..." for missing data, which is acceptable per request.
+            } else {
+                data = JSON.parse(rawData);
             }
 
-            const data = JSON.parse(rawData);
-
             // 2. Format Tanggal agar lebih cantik (misal: 2025-11-30 jadi 30 Nov 2025)
-            let formattedDate = data.bookingDate;
+            let formattedDate = data.bookingDate || 'N/A'; // Provide default if data.bookingDate is missing
             if (data.bookingDate) {
                 const dateObj = new Date(data.bookingDate);
                 const options = { day: 'numeric', month: 'short', year: 'numeric' };
