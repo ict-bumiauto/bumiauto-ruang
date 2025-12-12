@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const res = await fetch(API_URL);
             if (res.ok) allBookings = await res.json();
+            window.currentBookings = allBookings; // Simpan ke global agar bisa dibaca fungsi klik
         } catch (e) { console.error("Gagal load data"); }
 
         updateDashboardStats(allBookings);
@@ -149,8 +150,45 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = '/'; // Guest dilempar ke Login
             return;
         }
+
+        // Cek apakah ada booking di tanggal ini?
         const fullDate = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        window.location.href = `/dashboard?date=${fullDate}`;
+
+        // Cari event APPROVED di tanggal ini
+        // Kita butuh akses ke 'allBookings' yang di-fetch di awal. 
+        // Masalah: scope 'allBookings' ada di renderPage. Kita perlu menyimpannya di variabel global atau parsing ulang.
+        // Solusi Aman: Ambil dari elemen HTML yang sudah dirender (jika ada) atau fetch ulang (lambat).
+        // Solusi Terbaik: Simpan data global.
+
+        const events = window.currentBookings ? window.currentBookings.filter(b => b.bookingDate === fullDate && b.status === 'Approved') : [];
+
+        if (events.length > 0) {
+            // TAMPILKAN MODAL
+            const modal = document.getElementById('eventModal');
+            const body = document.getElementById('eventDetailsBody');
+
+            let html = '';
+            events.forEach(evt => {
+                html += `
+                <div class="modal-event-item">
+                     <strong>${evt.borrowerName} • ${evt.department}</strong>
+                     <p>Booking Purpose: ${evt.purpose}</p>
+                     <p>Time: ${evt.startTime} - ${evt.endTime}</p>
+                     <small>Room: ${evt.roomName}</small>
+                </div>
+                `;
+            });
+
+            body.innerHTML = html;
+            modal.style.display = 'flex';
+        } else {
+            // TIDAK ADA EVENT -> LANGSUNG REDIRECT
+            window.location.href = `/dashboard?date=${fullDate}`;
+        }
+    };
+
+    window.closeEventModal = () => {
+        document.getElementById('eventModal').style.display = 'none';
     };
 
     // Navigasi Bulan
