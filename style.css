@@ -763,13 +763,17 @@ body {
 
 /* 5. BADGE FIX (Pastikan muncul dan tidak hilang) */
 .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 50px;
     font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
     white-space: nowrap;
+    line-height: 1;
 }
 
 /* WARNA BADGE */
