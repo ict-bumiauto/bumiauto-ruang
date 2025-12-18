@@ -1524,13 +1524,13 @@ body.dark-mode .addon-select {
 /* --- FIX ROOM AVAILABILITY BACKGROUND --- */
 
 /* 1. Reset Container Utama agar Transparan (Menyatu dengan background abu) */
+/* 1. Reset Container Utama agar Transparan (Menyatu dengan background abu) */
 .availability-section {
+    width: 100%;
+    /* Ensure full width */
     background-color: transparent !important;
-    /* Hapus background putih */
     border: none !important;
-    /* Hapus border kotak besar */
     box-shadow: none !important;
-    /* Hapus bayangan kotak besar */
     padding-left: 0 !important;
     padding-right: 0 !important;
 }
@@ -1645,14 +1645,28 @@ body.dark-mode .error-bg {
 }
 
 /* --- FIX LEBAR SIDEBAR --- */
+/* --- FIX LEBAR SIDEBAR (25%) & LEFT CONTENT (75%) --- */
+
+.left-content {
+    flex: 3;
+    /* 75% width */
+    min-width: 0;
+    /* Prevent overflow */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .sidebar-section {
     flex: 1;
-    /* Mengembalikan lebar proporsional (25%) */
+    /* 25% width */
     display: flex;
     flex-direction: column;
     gap: 20px;
     min-width: 280px;
-    /* Menjaga agar tidak terlalu gepeng di layar kecil */
+    /* Prevent being squeezed too small */
+    max-width: 320px;
+    /* Prevent being too wide */
 }
 
 /* Pastikan form card mengambil sisa ruang */
@@ -1668,9 +1682,11 @@ body.dark-mode .error-bg {
     }
 
     .form-card,
+    .left-content,
     .sidebar-section {
         flex: auto;
         width: 100%;
+        max-width: 100%;
     }
 }
 
