@@ -264,6 +264,84 @@ app.put('/api/bookings/:ticketNumber', async (req, res) => {
     }
 });
 
+// --- F. USER MANAGEMENT ROUTES ---
+
+// 1. GET ALL USERS
+app.get('/api/users', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .order('name', { ascending: true });
+
+        if (error) throw error;
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// 2. ADD USER
+app.post('/api/users', async (req, res) => {
+    const { name, email, phone, division, role } = req.body;
+    const defaultPassword = '123456'; // Default password
+
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{
+                name,
+                email,
+                phone,
+                division,
+                role,
+                password: defaultPassword
+            }])
+            .select();
+
+        if (error) throw error;
+        res.status(201).json(data[0]);
+    } catch (err) {
+        res.status(500).json({ message: "Failed to add user: " + err.message });
+    }
+});
+
+// 3. DELETE USER
+app.delete('/api/users/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log("Deleting user ID:", id);
+
+    try {
+        const { error } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        res.json({ message: "User deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// 4. RESET PASSWORD
+app.put('/api/users/:id/reset-password', async (req, res) => {
+    const { id } = req.params;
+    const defaultPass = '123456';
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .update({ password: defaultPass })
+            .eq('id', id)
+            .select();
+
+        if (error) throw error;
+        res.json({ message: "Password reset to '123456'" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // ============================================================
 // 4. EXPORT APP (WAJIB UNTUK VERCEL)
 // ============================================================
