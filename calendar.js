@@ -98,9 +98,15 @@ document.addEventListener('DOMContentLoaded', function () {
             window.currentBookings = allBookings; // Simpan ke global agar bisa dibaca fungsi klik
         } catch (e) { console.error("Gagal load data"); }
 
-        updateDashboardStats(allBookings);
-        updateRoomStatus(allBookings);
+        // Data untuk Kalender (Tetap Semua agar tahu ketersediaan)
         renderCalendar(allBookings);
+
+        // Data untuk Sidebar (User Only)
+        // Jika User Login, filter khusus dia. Jika Guest, kosongkan/hide.
+        const myBookings = savedName ? allBookings.filter(b => b.borrowerName === savedName) : [];
+
+        updateDashboardStats(myBookings);
+        updateRoomStatus(allBookings); // Room status tetap global
     };
 
     // --- Render Kalender ---

@@ -99,10 +99,19 @@ app.get('/api/login', (req, res) => {
 // --- C. GET ALL BOOKINGS (Untuk Dashboard & Calendar) ---
 app.get('/api/bookings', async (req, res) => {
     try {
-        const { data, error } = await supabase
+        const { name } = req.query; // Ambil parameter ?name=...
+
+        let query = supabase
             .from('bookings')
             .select('*')
             .order('created_at', { ascending: false }); // Urutkan dari yang terbaru
+
+        // Jika ada parameter nama, filter berdasarkan borrowerName
+        if (name) {
+            query = query.eq('borrowerName', name);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
         res.json(data);
