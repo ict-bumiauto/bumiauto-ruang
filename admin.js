@@ -62,6 +62,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const dateObj = new Date(data.bookingDate);
         const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
+        // Logic WhatsApp Button
+        let waHtml = '';
+        if (data.whatsapp) {
+            let num = data.whatsapp.replace(/\D/g, '');
+            if (num.startsWith('0')) num = '62' + num.slice(1);
+            // Button style matching other actions but with WA color
+            waHtml = `<a href="https://wa.me/${num}" target="_blank" class="btn-action" style="background-color:#128C7E; color:white; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; font-size:14px;">📞 Kontak lebih lanjut</a>`;
+        }
+
         const html = `
             <div class="request-item" id="card-${data.ticketNumber}">
                 <div class="req-header">
@@ -69,11 +78,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="req-id">${data.ticketNumber}</span>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span class="req-user">${data.borrowerName} • ${data.department}</span>
-                            ${data.whatsapp ? (() => {
-                let num = data.whatsapp.replace(/\D/g, '');
-                if (num.startsWith('0')) num = '62' + num.slice(1);
-                return `<a href="https://wa.me/${num}" target="_blank" title="Chat WhatsApp" style="text-decoration:none; font-size:16px;">💬</a>`;
-            })() : ''}
                         </div>
                     </div>
                     <span class="badge badge-black" style="background:#F59E0B; color:white;">Pending</span>
@@ -95,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="req-actions">
                     <button class="btn-action btn-approve" onclick="handleAction('${data.ticketNumber}', 'Approved')">✅ Approve</button>
                     <button class="btn-action btn-reject" onclick="handleAction('${data.ticketNumber}', 'Rejected')">⛔ Reject</button>
+                    ${waHtml}
                 </div>
             </div>
         `;
