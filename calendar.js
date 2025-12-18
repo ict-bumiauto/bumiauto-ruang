@@ -315,9 +315,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Room Status ---
     function updateRoomStatus(allBookings) {
-        // Get Today's Date in YYYY-MM-DD format manually to match bookingDate format
+        // Get Today's Date in YYYY-MM-DD
         const now = new Date();
         const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        // Define Business Hours
+        const OPEN_TIME = "08:00";
+        const CLOSE_TIME = "18:00";
 
         document.querySelectorAll('.room-card-item').forEach(card => {
             const titleEl = card.querySelector('h4');
@@ -328,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const roomName = titleEl.innerText.trim();
 
                 // Find approved bookings for this room today
-                // UPDATE: Use includes() because DB room name might have " (15 orang)" suffix
                 const bookings = allBookings.filter(b =>
                     b.bookingDate === todayStr &&
                     b.status === 'Approved' &&
@@ -336,27 +339,54 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
                 if (bookings.length > 0) {
-                    // ROOM BOOKED
-                    badgeEl.innerText = 'Booked';
-                    badgeEl.className = 'badge badge-red';
-
-                    // Display Times (Sorted)
+                    // Check if Fully Booked (08:00 - 18:00) without gaps
+                    // Sort by start time
                     bookings.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+                    let currentPointer = OPEN_TIME;
+                    let isFullDay = true;
+
+                    for (let b of bookings) {
+                        if (b.startTime > currentPointer) {
+                            isFullDay = false; // Ada gap sebelum booking ini
+                            break;
+                        }
+                        // Extend pointer if this booking goes further
+                        if (b.endTime > currentPointer) {
+                            currentPointer = b.endTime;
+                        }
+                    }
+
+                    // Check if final pointer reached closing time
+                    if (currentPointer < CLOSE_TIME) isFullDay = false;
+
+                    // Display Logic
                     const timeList = bookings.map(b => `${b.startTime}-${b.endTime}`).join(', ');
+
+                    if (isFullDay) {
+                        // FULL BOOKED (08:00-18:00) -> RED + Booked
+                        badgeEl.innerText = 'Booked';
+                        badgeEl.className = 'badge badge-red';
+                    } else {
+                        // PARTIAL BOOKED -> BLACK + Available (But show times)
+                        badgeEl.innerText = 'Available';
+                        badgeEl.className = 'badge badge-black';
+                    }
 
                     if (descEl) {
                         descEl.innerText = timeList;
-                        descEl.style.color = "#DC2626"; // Red text to highlight
+                        descEl.style.color = "#DC2626"; // Red text for visibility
                         descEl.style.fontWeight = "600";
                     }
+
                 } else {
-                    // ROOM AVAILABLE
+                    // NO BOOKING -> AVAILABLE
                     badgeEl.innerText = 'Available';
                     badgeEl.className = 'badge badge-black';
 
                     if (descEl) {
                         descEl.innerText = 'No bookings for today';
-                        descEl.style.color = ""; // Reset to default
+                        descEl.style.color = "";
                         descEl.style.fontWeight = "";
                     }
                 }
