@@ -216,7 +216,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             // UPDATE RECENT BOOKINGS & STATS
-            updateDashboardStats(allBookings);
+            const currentUser = localStorage.getItem('currentUser');
+            const myBookings = currentUser ? allBookings.filter(b => b.borrowerName === currentUser) : [];
+            updateDashboardStats(myBookings);
 
         } catch (error) {
             console.error("Gagal update status:", error);
