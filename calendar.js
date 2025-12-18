@@ -136,6 +136,37 @@ document.addEventListener('DOMContentLoaded', function () {
         "2025-09-05", "2025-12-25", "2025-12-26"
     ];
 
+    // List Hari Libur Nasional 2026 (Official SKB 3 Menteri)
+    const holidays2026 = [
+        "2026-01-01", // Tahun Baru 2026
+        "2026-01-16", // Isra Mikraj
+        "2026-02-16", // Cuti Imlek
+        "2026-02-17", // Imlek
+        "2026-03-18", // Cuti Nyepi
+        "2026-03-19", // Nyepi
+        "2026-03-20", // Cuti Idul Fitri
+        "2026-03-21", // Idul Fitri
+        "2026-03-22", // Idul Fitri
+        "2026-03-23", // Cuti Idul Fitri
+        "2026-03-24", // Cuti Idul Fitri
+        "2026-04-03", // Wafat Yesus Kristus
+        "2026-04-05", // Paskah
+        "2026-05-01", // Hari Buruh
+        "2026-05-14", // Kenaikan Yesus Kristus
+        "2026-05-15", // Cuti Kenaikan Yesus Kristus
+        "2026-05-27", // Idul Adha
+        "2026-05-28", // Cuti Idul Adha
+        "2026-05-31", // Waisak
+        "2026-06-01", // Lahir Pancasila
+        "2026-06-16", // Tahun Baru Islam
+        "2026-08-17", // Kemerdekaan RI
+        "2026-08-25", // Maulid Nabi
+        "2026-12-24", // Cuti Natal
+        "2026-12-25"  // Natal
+    ];
+
+    const allHolidays = [...holidays2025, ...holidays2026];
+
     function renderCalendar(allBookings) {
         let firstDayofMonth = new Date(currYear, currMonth, 1).getDay();
         let lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate();
@@ -164,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Retrieve Current Date String safely
             let currentFullDate = `${currYear}-${String(currMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
 
-            let isNationalHoliday = holidays2025.includes(currentFullDate);
+            let isNationalHoliday = allHolidays.includes(currentFullDate);
             let isRedDate = isWeekend || isNationalHoliday;
 
             let activeClass = isToday ? "active" : "";
