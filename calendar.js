@@ -331,6 +331,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (titleEl && badgeEl) {
                 const roomName = titleEl.innerText.trim();
 
+                // ADD CLICK EVENT TO CARD
+                card.style.cursor = "pointer";
+                card.onclick = () => showRoomDetails(roomName);
+
                 // Find approved bookings for this room today
                 const bookings = allBookings.filter(b =>
                     b.bookingDate === todayStr &&
@@ -393,6 +397,47 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // --- Show Room Details Modal (Carousel Click) ---
+    window.showRoomDetails = (roomName) => {
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        let allBookings = window.currentBookings || [];
+
+        // Filter bookings for this room today
+        const bookings = allBookings.filter(b =>
+            b.bookingDate === todayStr &&
+            b.status === 'Approved' &&
+            b.roomName.toLowerCase().includes(roomName.toLowerCase())
+        );
+
+        const modal = document.getElementById('eventModal');
+        const body = document.getElementById('eventDetailsBody');
+        const title = document.getElementById('modalEventTitle');
+
+        if (title) title.innerText = `Schedule: ${roomName} (${todayStr})`;
+
+        let html = '';
+        if (bookings.length > 0) {
+            bookings.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            bookings.forEach(evt => {
+                html += `
+                <div class="modal-event-item" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+                     <div style="color:#2563EB; font-weight:bold;">🕒 ${evt.startTime} - ${evt.endTime}</div>
+                     <div><strong>${evt.borrowerName}</strong> (${evt.department})</div>
+                     <div style="font-size:12px; color:#64748B; margin-top:2px;">Purpose: ${evt.purpose}</div>
+                </div>
+                `;
+            });
+        } else {
+            html = `<p style="text-align:center; color:#64748B; padding:20px;">No bookings for this room today. Room is available.</p>`;
+        }
+
+        body.innerHTML = html;
+        modal.style.display = 'flex';
+    };
 
     renderPage();
 });
