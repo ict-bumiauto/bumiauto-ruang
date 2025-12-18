@@ -328,10 +328,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const roomName = titleEl.innerText.trim();
 
                 // Find approved bookings for this room today
+                // UPDATE: Use includes() because DB room name might have " (15 orang)" suffix
                 const bookings = allBookings.filter(b =>
                     b.bookingDate === todayStr &&
                     b.status === 'Approved' &&
-                    b.roomName.trim() === roomName
+                    b.roomName.toLowerCase().includes(roomName.toLowerCase())
                 );
 
                 if (bookings.length > 0) {
