@@ -134,8 +134,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         for (let i = firstDayofMonth; i > 0; i--) liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
 
+        // Define Today for Comparison
+        let todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
+
         for (let i = 1; i <= lastDateofMonth; i++) {
             let isToday = i === new Date().getDate() && currMonth === new Date().getMonth() && currYear === new Date().getFullYear();
+
+            // Check if Past Date
+            let checkDate = new Date(currYear, currMonth, i);
+            let isPast = checkDate < todayDate;
+
             let activeClass = isToday ? "active" : "";
 
             let currentFullDate = `${currYear}-${String(currMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
@@ -143,13 +152,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let eventHTML = '';
             events.forEach(evt => {
-                let shortPurpose = evt.purpose.split(' ').slice(0, 3).join(' '); // Ambil 3 kata pertama
+                let shortPurpose = evt.purpose.split(' ').slice(0, 3).join(' ');
                 eventHTML += `<div class="calendar-event">• ${shortPurpose} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
             });
 
-            // Klik Tanggal: Jika User -> Dashboard, Jika Guest -> Login
-            liTag += `<li class="${activeClass}" onclick="selectDate(${currYear}, ${currMonth}, ${i})">
+            if (isPast) {
+                // TANGGAL LEWAT -> DISABLE (Class inactive, Hapus OnClick)
+                liTag += `<li class="inactive"><span class="date-num">${i}</span>${eventHTML}</li>`;
+            } else {
+                // HARI INI & MASA DEPAN -> BISA DIKLIK
+                liTag += `<li class="${activeClass}" onclick="selectDate(${currYear}, ${currMonth}, ${i})">
                         <span class="date-num">${i}</span>${eventHTML}</li>`;
+            }
         }
         for (let i = lastDayofMonth; i < 6; i++) liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
 
