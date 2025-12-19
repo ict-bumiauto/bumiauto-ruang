@@ -1,0 +1,19 @@
+
+/* Style Event di Kalender (Hijau & Rapi) */
+.calendar-event {
+    background-color: #10B981; /* Green */
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-top: 4px;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calendar-event span {
+    font-size: 9px;
+    opacity: 0.9;
+}

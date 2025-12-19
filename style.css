@@ -1596,4 +1596,23 @@ body.dark-mode .booking-dept {
 
 .btn-collapse-sidebar:hover {
     color: var(--primary-blue);
-}
+} 
+ / *   S t y l e   E v e n t   d i   K a l e n d e r   ( H i j a u   &   R a p i )   * /  
+ . c a l e n d a r - e v e n t   {  
+         b a c k g r o u n d - c o l o r :   # 1 0 B 9 8 1 ;   / *   G r e e n   * /  
+         c o l o r :   w h i t e ;  
+         p a d d i n g :   2 p x   6 p x ;  
+         b o r d e r - r a d i u s :   4 p x ;  
+         f o n t - s i z e :   1 0 p x ;  
+         m a r g i n - t o p :   4 p x ;  
+         l i n e - h e i g h t :   1 . 2 ;  
+         o v e r f l o w :   h i d d e n ;  
+         t e x t - o v e r f l o w :   e l l i p s i s ;  
+         w h i t e - s p a c e :   n o w r a p ;  
+ }  
+  
+ . c a l e n d a r - e v e n t   s p a n   {  
+         f o n t - s i z e :   9 p x ;  
+         o p a c i t y :   0 . 9 ;  
+ }  
+ 

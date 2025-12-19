@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let eventHTML = '';
             events.forEach(evt => {
                 let shortPurpose = evt.purpose.split(' ').slice(0, 3).join(' ');
-                eventHTML += `<div class="calendar-event">• ${shortPurpose} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
+                eventHTML += `<div class="calendar-event">${shortPurpose} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
             });
 
             if (isPast) {

@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let eventHTML = '';
             events.forEach(evt => {
                 let shortName = evt.borrowerName.split(' ')[0];
-                eventHTML += `<div class="calendar-event" title="${evt.roomName}">• ${shortName} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
+                eventHTML += `<div class="calendar-event" title="${evt.roomName}">${shortName} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
             });
 
             liTag += `<li class="${activeClass}" onclick="showDayDetails('${currentFullDate}')" style="cursor: pointer;">
