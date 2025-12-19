@@ -247,15 +247,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Fungsi Klik Tanggal (Updated)
-    window.selectDate = (y, m, d) => {
+    window.showDayDetails = (fullDateString) => {
+        // Parse date string YYYY-MM-DD
+        const [y, m, d] = fullDateString.split('-').map(Number);
+
         if (!savedName) {
             alert("Silakan Login untuk melakukan booking pada tanggal ini.");
             window.location.href = '/'; // Guest dilempar ke Login
             return;
         }
 
+
+
         // Cek apakah ada booking di tanggal ini?
-        const fullDate = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const fullDate = fullDateString;
 
         // Cari event APPROVED di tanggal ini
         // Kita butuh akses ke 'allBookings' yang di-fetch di awal. 
