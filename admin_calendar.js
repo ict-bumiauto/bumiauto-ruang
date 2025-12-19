@@ -111,12 +111,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let eventHTML = '';
             events.forEach(evt => {
-                let shortName = evt.borrowerName.split(' ')[0];
-                eventHTML += `<div class="calendar-event" title="${evt.roomName}">${shortName} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
+                let shortName = evt.borrowerName; // Use full name but truncated by CSS
+                eventHTML += `<div class="calendar-event" title="${evt.roomName}">
+                                <span>${evt.startTime}</span>
+                                ${shortName}
+                              </div>`;
             });
 
             liTag += `<li class="${activeClass}" onclick="showDayDetails('${currentFullDate}')" style="cursor: pointer;">
-                        <span class="date-num">${i}</span>${holidayName ? `<div class="holiday-name">${holidayName}</div>` : ''}${eventHTML}</li>`;
+                        <span class="date-num">${i}</span>
+                        ${holidayName ? `<div class="holiday-name">${holidayName}</div>` : ''}
+                        ${eventHTML}
+                      </li>`;
         }
         for (let i = lastDayofMonth; i < 6; i++) liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
 

@@ -602,86 +602,127 @@ body {
     text-align: center;
 }
 
-/* Grid Kalender */
+/* Grid Kalender KALLA Style */
 .calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     list-style: none;
-    margin-bottom: 10px;
+    margin-bottom: 0;
+    /* Menempel dengan grid hari */
     text-align: center;
     font-weight: 600;
     color: var(--text-muted);
-    font-size: 12px;
+    font-size: 13px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #F8FAFC;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
 .calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     list-style: none;
-    gap: 8px;
-    /* Jarak antar kotak tanggal */
+    gap: 0;
+    /* Hilangkan gap agar garis menyambung */
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-card);
 }
 
 .calendar-days li {
-    height: 80px;
-    /* Tinggi kotak tanggal */
-    border: 1px solid #F1F5F9;
-    border-radius: 6px;
-    padding: 10px;
+    min-height: 120px;
+    /* Lebih tinggi untuk muat event */
+    border: 1px solid var(--border-color);
+    margin: -1px 0 0 -1px;
+    /* Overlap border biar rapi */
+    padding: 8px;
     font-size: 13px;
     position: relative;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    /* Align top-left */
 }
 
 .calendar-days li:hover {
-    border-color: var(--primary-blue);
+    background-color: #F8FAFC;
+    z-index: 1;
+    /* Supaya border hover kelihatan */
+}
+
+/* Date Number Style */
+.date-num {
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Tanggal Hari Ini / Aktif */
+.calendar-days li.active .date-num {
+    background-color: #10B981;
+    /* Green Circle */
+    color: white;
+    font-weight: 700;
 }
 
 /* Tanggal yang tidak aktif (bulan lalu/depan) */
 .calendar-days li.inactive {
     color: #CBD5E1;
-    background-color: #FAFAFA;
+    background-color: #F9FAFB;
 }
 
-/* Tanggal Hari Ini / Aktif */
-.calendar-days li.active {
-    background-color: #EFF6FF;
-    /* Biru muda */
-    border: 1px solid var(--primary-blue);
-    color: var(--primary-blue);
-    font-weight: 700;
-}
-
-/* Tanggal Libur/Merah (Weekend & National Holiday) */
+/* Tanggal Libur (Weekend & National Holiday) */
 .calendar-days li.holiday {
-    color: #DC2626;
-    /* Merah */
-    background-color: #FEF2F2;
-    /* Merah Muda Sangat Pucat */
+    background-color: #FFF1F2;
+    /* Pink muda */
 }
 
-/* Pastikan active tetap menang jika hari ini libur */
-.calendar-days li.holiday.active {
-    background-color: #FEF2F2;
-    border-color: #DC2626;
-    color: #DC2626;
+.calendar-days li.holiday .date-num,
+.calendar-days li.holiday .holiday-name {
+    color: #E11D48;
+    /* Merah pink */
 }
 
-/* Style Nama Hari Libur */
-.holiday-name {
+/* Style Event di Kalender (KALLA Style: Light Green Pill) */
+.calendar-event {
+    background-color: #ECFDF5;
+    /* Hijau Muda Sekali */
+    color: #065F46 !important;
+    /* Hijau Tua text */
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-top: 4px;
+    line-height: 1.4;
+    width: 100%;
+    text-align: left;
+    border-left: 3px solid #10B981;
+    /* Aksen garis kiri */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.calendar-event span {
+    font-weight: 700;
+    color: #047857 !important;
     font-size: 10px;
-    color: #DC2626;
-    margin-top: 2px;
-    font-weight: 500;
-    line-height: 1.1;
-}
-
-/* Pastikan inactive tetap menang jika tanggal lewat */
-.calendar-days li.inactive.holiday {
-    color: #CBD5E1;
-    /* Kembali ke abu */
-    background-color: #FAFAFA;
+    display: block;
+    /* Time on new line or block */
+    margin-bottom: 1px;
 }
 
 /* -- ROOM AVAILABILITY SECTION -- */
@@ -1600,25 +1641,4 @@ body.dark-mode .booking-dept {
     color: var(--primary-blue);
 }
 
-/* Style Event di Kalender (Hijau & Rapi) */
-.calendar-event {
-    background-color: #10B981;
-    /* Green */
-    color: white !important;
-    /* Force white text */
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 10px;
-    margin-top: 4px;
-    line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.calendar-event span {
-    font-size: 9px;
-    opacity: 0.9;
-    color: white !important;
-    /* Force white text for span too */
-}
+/* End of sidebar collapse styles */

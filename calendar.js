@@ -222,18 +222,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let eventHTML = '';
             events.forEach(evt => {
-                let shortPurpose = evt.purpose.split(' ').slice(0, 3).join(' ');
-                eventHTML += `<div class="calendar-event">${shortPurpose} <br> <span style="font-size:9px">${evt.startTime}</span></div>`;
+                let shortPurpose = evt.purpose; // Use full purpose but truncated by CSS
+                eventHTML += `<div class="calendar-event" title="${evt.purpose}">
+                                <span>${evt.startTime}</span>
+                                ${shortPurpose}
+                              </div>`;
             });
 
             if (isPast) {
                 // TANGGAL LEWAT -> DISABLE (Class inactive, Hapus OnClick)
-                // Tetap tambahkan class holiday agar tahu itu hari libur meski disable
-                liTag += `<li class="inactive ${isRedDate ? 'holiday' : ''}"><span class="date-num">${i}</span>${holidayName ? `<div class="holiday-name">${holidayName}</div>` : ''}${eventHTML}</li>`;
+                liTag += `<li class="inactive"><span class="date-num">${i}</span></li>`;
             } else {
-                // HARI INI & MASA DEPAN -> BISA DIKLIK (MERAH JIKA HOLIDAY)
-                liTag += `<li class="${activeClass}" onclick="selectDate(${currYear}, ${currMonth}, ${i})">
-                        <span class="date-num">${i}</span>${holidayName ? `<div class="holiday-name">${holidayName}</div>` : ''}${eventHTML}</li>`;
+                // TANGGAL MASA DEPAN / HARI INI -> CLICKABLE
+                liTag += `<li class="${activeClass}" onclick="showDayDetails('${currentFullDate}')">
+                            <span class="date-num">${i}</span>
+                            ${holidayName ? `<div class="holiday-name">${holidayName}</div>` : ''}
+                            ${eventHTML}
+                          </li>`;
             }
         }
         for (let i = lastDayofMonth; i < 6; i++) liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
