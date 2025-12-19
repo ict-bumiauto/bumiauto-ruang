@@ -43,6 +43,8 @@
         </div>
     </div>
 
+    <button id="expandSidebarBtn" class="btn-expand-sidebar" onclick="toggleSidebar()" title="Show Sidebar">❮</button>
+
     <main class="main-container">
 
         <div class="left-content">
@@ -150,7 +152,10 @@
 
         <aside class="sidebar">
             <div class="card stats-card">
-                <h3>Admin Actions</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 0;">Admin Actions</h3>
+                    <button class="btn-collapse-sidebar" onclick="toggleSidebar()" title="Hide Sidebar">❯</button>
+                </div>
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
                     Klik tanggal di kalender untuk melihat detail booking, membatalkan jadwal, atau membuat <b>Priority
                         Booking</b>.

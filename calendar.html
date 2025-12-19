@@ -43,6 +43,8 @@
         </div>
     </div>
 
+    <button id="expandSidebarBtn" class="btn-expand-sidebar" onclick="toggleSidebar()" title="Show Sidebar">❮</button>
+
     <main class="main-container">
 
         <div class="left-content">
@@ -176,7 +178,10 @@
 
         <aside class="sidebar-section">
             <div class="card quick-stats">
-                <h3>Quick Stats</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin-bottom: 0;">Quick Stats</h3>
+                    <button class="btn-collapse-sidebar" onclick="toggleSidebar()" title="Hide Sidebar">❯</button>
+                </div>
                 <ul class="stats-list">
                     <li><span>Total Bookings</span><span class="stat-value">0</span></li>
                     <li><span>Approved</span><span class="stat-value text-green">0</span></li>
